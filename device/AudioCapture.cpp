@@ -25,16 +25,23 @@ int main(int argc, const char* argv[]) {
     LOGE("Main", "Open microphone err, err_code {}, err_info {}", ret, errors);
     return -1;
   }
-  
+
   AVPacket pkt;
   av_init_packet(&pkt);
+    
+  FILE* fOutput = NULL;
+  const char* outPutPath = "/Users/gofran/Documents/workspace/gitproj/FfmpegDemo/resource/out.pcm";
+  fOutput = fopen(outPutPath, "wb+");
+  
   int cnt = 0;
   while ((0 == (ret = av_read_frame(fmtCtx, &pkt))) && (cnt++ < 500)) {
     LOGD("Main", "Read ({}) pkt size {}", cnt, pkt.size);
+    fwrite(pkt.data, 1, pkt.size, fOutput);
     av_packet_unref(&pkt);
   }
   
-  avformat_close_input(&fmtCtx);
+  fclose(fOutput);
+  avformat_close_https://github.com/GofranChang/Doc.gitinput(&fmtCtx);
 
   LOGI("Main", "Return 0");
   return 0;
