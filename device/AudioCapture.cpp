@@ -25,7 +25,7 @@ int main(int argc, const char* argv[]) {
     LOGE("Main", "Open microphone err, err_code {}, err_info {}", ret, errors);
     return -1;
   }
-
+  
   AVPacket pkt;
   av_init_packet(&pkt);
     
@@ -41,8 +41,7 @@ int main(int argc, const char* argv[]) {
   }
   
   fclose(fOutput);
-  avformat_close_https://github.com/GofranChang/Doc.gitinput(&fmtCtx);
-
+  avformat_close_input(&fmtCtx);
   LOGI("Main", "Return 0");
   return 0;
 }
