@@ -9,4 +9,4 @@ include_directories("${PROJECT_SOURCE_DIR}/utils/log")
 link_directories("${FFMPEG_DIR}/lib")
 
 add_executable(audiocapture ${AVDEVICE_SRC})
-target_link_libraries(audiocapture avformat avutil avdevice logger)
+target_link_libraries(audiocapture avformat avutil avdevice swresample logger)
