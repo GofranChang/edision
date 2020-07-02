@@ -1,6 +1,9 @@
 set(AVDEVICE_SRC
-  AudioCapture.h
-  AudioCapture.cpp
+#  AudioCapture.h
+#  AudioCapture.cpp
+  AudioDevice.h
+  AudioDevice.cpp
+  main.cpp
 )
 
 include_directories("${FFMPEG_DIR}/include")
