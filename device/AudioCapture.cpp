@@ -79,6 +79,15 @@ int main(int argc, const char* argv[]) {
   }
   
   fclose(fOut);
+  
+  if (srcData) av_freep(&srcData[0]);
+  av_freep(srcData);
+  
+  if (dstData) av_freep(&dstData[0]);
+  av_freep(dstData);
+  
+  swr_free(&swrCtx);
+  
   avformat_close_input(&fmtCtx);
   LOGI("device", "Return 0");
   
