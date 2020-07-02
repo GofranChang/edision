@@ -37,9 +37,33 @@ int initResample(SwrContext **swrCtx) {
   }
 }
 
+int initEncoder(AVCodec** codec, AVCodecContext** codecCtx) {
+  int ret = 0;
+  
+  *codec = avcodec_find_encoder_by_name("libfdk_aac");
+  *codecCtx = avcodec_alloc_context3(*codec);
+  (*codecCtx)->sample_fmt = AV_SAMPLE_FMT_S16;
+  (*codecCtx)->sample_rate = 44100;
+  (*codecCtx)->channel_layout = AV_CH_LAYOUT_MONO;
+  (*codecCtx)->bit_rate = 64000;
+//  (*codecCtx)->profile = FF_PROFILE_AAC_HE_V2;
+  
+//  avcodec_open2(*codecCtx, codec, NULL);
+  ret = avcodec_open2(*codecCtx, *codec, NULL);
+  if (ret < 0) {
+    LOGE("device", "Open code error, ret ({})", ret);
+    return ret;
+  }
+  
+  return 0;
+}
+
 int main(int argc, const char* argv[]) {
   auto logger = my_media::KooLogger::Instance();
   logger->initLogger(spdlog::level::debug, true, "", false);
+  
+  av_register_all();
+  avcodec_register_all();
 
   av_log_set_level(AV_LOG_DEBUG);
   
@@ -59,10 +83,29 @@ int main(int argc, const char* argv[]) {
   int dstLinesize = 0;
   av_samples_alloc_array_and_samples(&dstData, &dstLinesize, 1, 512, AV_SAMPLE_FMT_S16, 0);
   
+  AVCodec* codec = NULL;
+  AVCodecContext* codecCtx = NULL;
+  ret = initEncoder(&codec, &codecCtx);
+  AVFrame* frame = av_frame_alloc();
+  frame->nb_samples = 512;
+  frame->format = AV_SAMPLE_FMT_S16;
+  frame->channel_layout = AV_CH_LAYOUT_MONO;
+  av_frame_get_buffer(frame, 0);
+  if (!frame || !frame->buf[0]) {
+    LOGE("device", "alloc frame error");
+    return -2;
+  }
+  
+  AVPacket* newPkt = av_packet_alloc();
+  if (NULL == newPkt) {
+    LOGE("device", "alloc avpacket error");
+    return -3;
+  }
+  
   AVPacket pkt;
   av_init_packet(&pkt);
   
-  FILE* fOut = fopen("/Users/gofran/Documents/workspace/gitproj/FfmpegDemo/resource/out.pcm", "wb+");
+  FILE* fOut = fopen("/Users/gofran/Documents/workspace/gitproj/FfmpegDemo/resource/out.aac", "wb+");
   for (int i = 0; i < 500; i++) {
     if (recordAudio(fmtCtx, &pkt) < 0) {
       LOGE("device", "Record failed");
@@ -72,7 +115,29 @@ int main(int argc, const char* argv[]) {
       memcpy((void *)srcData[0], pkt.data, pkt.size);
       swr_convert(swrCtx, dstData, 512, (const uint8_t **)srcData, 512);
       
-      fwrite(dstData[0], 1, dstLinesize, fOut);
+      //Encode
+      memcpy((void*)frame->data[0], dstData[0], dstLinesize);
+      ret = avcodec_send_frame(codecCtx, frame);
+      
+      while (ret >= 0) {
+        ret = avcodec_receive_packet(codecCtx, newPkt);
+        if (ret < 0) {
+          if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+            break;
+          } else {
+            LOGE("device", "Encoding error");
+            return -3;
+          }
+        }
+        fwrite(newPkt->data, 1, newPkt->size, fOut);
+//        if (ret >= 0) {
+//          fwrite(<#const void *__ptr#>, <#size_t __size#>, <#size_t __nitems#>, <#FILE *__stream#>)
+//        } else {
+//          break;
+//        }
+      }
+      
+//      fwrite(dstData[0], 1, dstLinesize, fOut);
 //      fwrite(pkt.data, 1, pkt.size, fOut);
       av_packet_unref(&pkt);
     }
