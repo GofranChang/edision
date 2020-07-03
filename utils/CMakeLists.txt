@@ -3,8 +3,15 @@ set(LOGGER_SRC
   log/MyLogger.cpp
 )
 
-include_directories("log")
-# link_directories("${FFMPEG_DIR}/lib")
+file(GLOB SPDLOG_SRC
+  "log/spdlog/*.h"
+  "log/spdlog/details/*.h"
+  "log/spdlog/fmt/*.h"
+  "log/spdlog/fmt/bundled/*.h"
+  "log/spdlog/sinks/*.h"
+)
 
-add_library(logger ${LOGGER_SRC})
-# target_link_libraries(logger pthread)
+include_directories("log")
+source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${LOGGER_SRC} ${SPDLOG_SRC})
+
+add_library(logger ${LOGGER_SRC} ${SPDLOG_SRC})
