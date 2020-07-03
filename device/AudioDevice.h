@@ -31,6 +31,22 @@ public:
   }
 };
 
+class AVFmtCtxGurand {
+public:
+  AVFmtCtxGurand() : _mData(NULL) {}
+  ~AVFmtCtxGurand() {
+    if (_mData != NULL)
+      avformat_close_input(&_mData);
+  }
+  
+  inline AVFormatContext** get() {
+    return &_mData;
+  }
+  
+private:
+  AVFormatContext* _mData;
+};
+
 class DataSink {
 public:
   virtual void onData(uint8_t* data, size_t size) = 0;
@@ -54,7 +70,8 @@ private:
   
   std::unique_ptr<AVPacket> _mAVPkt;
   
-  std::unique_ptr<AVFormatContext*, AVFormatCtxDeleter> _mFmtCtx;
+//  std::unique_ptr<AVFormatContext*, AVFormatCtxDeleter> _mFmtCtx;
+  AVFmtCtxGurand _mFmtCtx;
 };
 
 } // namespace edision

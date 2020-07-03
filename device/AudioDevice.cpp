@@ -2,8 +2,7 @@
 
 namespace edision {
 
-AudioRecorder::AudioRecorder() : _mFmtCtx(nullptr)
-                               , _mDataSink(nullptr)
+AudioRecorder::AudioRecorder() : _mDataSink(nullptr)
                                , _mAVPkt(nullptr) {
 }
 
@@ -12,8 +11,6 @@ int AudioRecorder::init(std::string& devName, std::string& inpName) {
   
   AVFormatContext* fmtCtx = NULL;
 
-//  int ret = avformat_open_input(fmtCtx, devName.c_str(), av_find_input_format(inpName.c_str()), NULL);
-  _mFmtCtx.reset((AVFormatContext**)malloc(sizeof(AVFormatContext*)));
   int ret = avformat_open_input(_mFmtCtx.get(), devName.c_str(), av_find_input_format(inpName.c_str()), NULL);
   if (ret < 0) {
     char errors[1024];
@@ -23,7 +20,6 @@ int AudioRecorder::init(std::string& devName, std::string& inpName) {
   }
   
   LOGI("A Recorder", "Open microphone {} success", devName);
-//  _mFmtCtx.reset(fmtCtx);
   _mAVPkt.reset(av_packet_alloc());
 
   return 0;

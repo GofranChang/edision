@@ -3,6 +3,8 @@
 
 using namespace edision;
 
+static FILE* gFout = nullptr;
+
 class MyDataSink : public DataSink {
 public:
   virtual void onData(uint8_t* data, size_t size) override;
@@ -10,6 +12,8 @@ public:
 
 void MyDataSink::onData(uint8_t *data, size_t size) {
   LOGD("Main", "onData, size ({})", size);
+  if (gFout)
+    fwrite(data, 1, size, gFout);
 }
 
 int main(int argc, const char* argv[]) {
@@ -24,9 +28,13 @@ int main(int argc, const char* argv[]) {
   std::shared_ptr<DataSink> dataSink(new MyDataSink);
   rec.setDataSink(dataSink);
   
+  gFout = fopen("/Users/gofran/Documents/workspace/gitproj/FfmpegDemo/resource/newout.aac", "wb+");
   for (int i = 0; i < 500; i++) {
     rec.record();
   }
+  
+  fflush(gFout);
+  fclose(gFout);
   
   return 0;
 }
