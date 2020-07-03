@@ -20,39 +20,30 @@ extern "C" {
 }
 #endif
 
+#include "AVGuard.h"
+
 namespace edision {
-
-class AVFormatCtxDeleter {
-public:
-  void operator()(AVFormatContext** p) {
-    if (p != nullptr) {
-      avformat_close_input(p);
-    }
-  }
-};
-
-class AVFmtCtxGurand {
-public:
-  AVFmtCtxGurand() : _mData(NULL) {}
-  ~AVFmtCtxGurand() {
-    if (_mData != NULL)
-      avformat_close_input(&_mData);
-  }
-  
-  inline AVFormatContext** get() {
-    return &_mData;
-  }
-  
-private:
-  AVFormatContext* _mData;
-};
 
 class DataSink {
 public:
   virtual void onData(uint8_t* data, size_t size) = 0;
 };
 
-class AudioRecorder {
+class AVDataSourceBase {
+public:
+  AVDataSourceBase() : _mDataSink(nullptr) {
+  }
+  ~AVDataSourceBase() = default;
+  
+  inline void setDataSink(std::shared_ptr<DataSink> dataSink) {
+    _mDataSink = dataSink;
+  }
+  
+protected:
+  std::shared_ptr<DataSink> _mDataSink;
+};
+
+class AudioRecorder : public AVDataSourceBase {
 public:
   AudioRecorder();
   ~AudioRecorder() = default;
@@ -61,17 +52,22 @@ public:
   
   int record();
   
-  inline void setDataSink(std::shared_ptr<DataSink> dataSink) {
-    _mDataSink = dataSink;
-  }
-  
 private:
-  std::shared_ptr<DataSink> _mDataSink;
-  
   std::unique_ptr<AVPacket> _mAVPkt;
+
+  AVGuard<AVFormatContext> _mFmtCtx;
+};
+
+class AudioResample : public AVDataSourceBase {
+public:
+  AudioResample();
+  ~AudioResample() = default;
   
-//  std::unique_ptr<AVFormatContext*, AVFormatCtxDeleter> _mFmtCtx;
-  AVFmtCtxGurand _mFmtCtx;
+  int init();
+  
+  int record();
+  
+  int resample();
 };
 
 } // namespace edision

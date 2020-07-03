@@ -2,8 +2,8 @@
 
 namespace edision {
 
-AudioRecorder::AudioRecorder() : _mDataSink(nullptr)
-                               , _mAVPkt(nullptr) {
+AudioRecorder::AudioRecorder() : _mAVPkt(nullptr)
+                               , _mFmtCtx(avformat_close_input) {
 }
 
 int AudioRecorder::init(std::string& devName, std::string& inpName) {

@@ -22,7 +22,7 @@ if(NOT FFMPEG_DIR)
 endif()
 
 add_subdirectory(utils)
-add_subdirectory(device)
+add_subdirectory(src)
 # include_directories(device)
 
 # include_directories("./deps/MAC/ffmpeg/include")
