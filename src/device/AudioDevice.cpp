@@ -25,10 +25,6 @@ int AudioRecorder::init(std::string& devName, std::string& inpName) {
   return 0;
 }
 
-//void AudioRecorder::setDataSink(std::shared_ptr<DataSink> dataSink) {
-//  _mDataSink = dataSink;
-//}
-
 int AudioRecorder::record() {
   int ret = 0;
   ret = av_read_frame(*(_mFmtCtx.get()), _mAVPkt.get());
