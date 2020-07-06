@@ -17,5 +17,9 @@ link_directories("${FFMPEG_DIR}/lib")
 
 source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${AVCOMMON_SRC} ${AVDEVICE_SRC})
 
+#set_target_properties(audiocapture PROPERTIES RESOURCE "${PROJECT_SOURCE_DIR}/src/device/Info.plist")
+
 add_executable(audiocapture ${AVDEVICE_SRC} ${AVCOMMON_SRC})
+# set_target_properties(audiocapture PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/src/device/Info.plist)
+
 target_link_libraries(audiocapture avformat avutil avdevice avcodec swresample logger)

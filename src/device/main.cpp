@@ -5,7 +5,7 @@ using namespace edision;
 
 static FILE* gFout = nullptr;
 
-class MyDataSink : public DataSink {
+class MyDataSink : public AVDataSinkBase {
 public:
   virtual void onData(uint8_t* data, size_t size) override;
 };
@@ -25,10 +25,10 @@ int main(int argc, const char* argv[]) {
   std::string inpName = "avfoundation";
   rec.init(devName, inpName);
   
-  std::shared_ptr<DataSink> dataSink(new MyDataSink);
+  std::shared_ptr<AVDataSinkBase> dataSink(new MyDataSink);
   rec.setDataSink(dataSink);
   
-  gFout = fopen("/Users/gofran/Documents/workspace/gitproj/FfmpegDemo/resource/newout.aac", "wb+");
+  gFout = fopen("/Users/gofran/Documents/workspace/gitproj/FfmpegDemo/resource/newout.pcm", "wb+");
   for (int i = 0; i < 500; i++) {
     rec.record();
   }

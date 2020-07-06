@@ -21,11 +21,10 @@ extern "C" {
 #endif
 
 #include "AVGuard.h"
-#include "AVConfig.h"
 
 namespace edision {
 
-class AVDataSinkBase {
+class DataSink {
 public:
   virtual void onData(uint8_t* data, size_t size) = 0;
 };
@@ -36,12 +35,12 @@ public:
   }
   ~AVDataSourceBase() = default;
   
-  inline void setDataSink(std::shared_ptr<AVDataSinkBase> dataSink) {
+  inline void setDataSink(std::shared_ptr<DataSink> dataSink) {
     _mDataSink = dataSink;
   }
   
 protected:
-  std::shared_ptr<AVDataSinkBase> _mDataSink;
+  std::shared_ptr<DataSink> _mDataSink;
 };
 
 class AudioRecorder : public AVDataSourceBase {
@@ -59,28 +58,19 @@ private:
   AVGuard<AVFormatContext> _mFmtCtx;
 };
 
-class AudioResample : public AVDataSourceBase
-                    , public AVDataSinkBase {
+class AudioResample : public AVDataSourceBase {
 public:
   AudioResample();
   ~AudioResample() = default;
-
-  int init(AudioConfig& inCfg, AudioConfig& outCfg);
-
-  // int record();
-
+  
+  int init();
+  
+  int record();
+  
   int resample();
-
-  virtual void onData(uint8_t* data, size_t size) override;
-
+    
 private:
   AVGuard<SwrContext> _mSwrCtx;
-
-  AVGuard<uint8_t> _mSrcData;
-  AVGuard<uint8_t> _mDstData;
-
-  AudioConfig _mSrcCfg;
-  AudioConfig _mSinkCfg;
 };
 
 } // namespace edision

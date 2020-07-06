@@ -23,6 +23,11 @@ endif()
 
 add_subdirectory(utils)
 add_subdirectory(src)
+
+#set_target_properties(ffmpegDemo PROPERTIES
+#  MACOSX_BUNDLE TRUE
+#  MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/src/device/Info.plist
+#)
 # include_directories(device)
 
 # include_directories("./deps/MAC/ffmpeg/include")
