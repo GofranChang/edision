@@ -17,6 +17,7 @@ namespace edision {
 
 struct AudioConfig {
   int64_t _mChannelLayout;
+  int _mChannelNums;
   AVSampleFormat _mSampleFmt;
   int _mSampleRate;
 };

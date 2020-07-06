@@ -36,12 +36,12 @@ public:
   }
   ~AVDataSourceBase() = default;
   
-  inline void setDataSink(std::shared_ptr<AVDataSinkBase> dataSink) {
+  inline void setDataSink(AVDataSinkBase* dataSink) {
     _mDataSink = dataSink;
   }
   
 protected:
-  std::shared_ptr<AVDataSinkBase> _mDataSink;
+  AVDataSinkBase* _mDataSink;
 };
 
 class AudioRecorder : public AVDataSourceBase {
@@ -56,32 +56,34 @@ public:
   int record();
   
 private:
-//  std::unique_ptr<AVPacket> _mAVPkt;
   AVPacket* _mAVPkt;
 
-  // AVGuard<AVFormatContext> _mFmtCtx;
   AVFormatContext* _mFmtCtx;
 };
 
-class AudioResample : public AVDataSourceBase
-                    , public AVDataSinkBase {
+class AudioResampler : public AVDataSourceBase {
 public:
-  AudioResample();
-  ~AudioResample() = default;
+  AudioResampler();
+  ~AudioResampler();
 
-  int init(AudioConfig& inCfg, AudioConfig& outCfg);
+  int init(AudioConfig& inCfg, AudioConfig& outCfg, int srcNbSample);
+  
+  void uninit();
 
-  // int record();
-
-  int resample();
-
-  virtual void onData(uint8_t* data, size_t size) override;
+  int resample(uint8_t* data, size_t size);
 
 private:
-  AVGuard<SwrContext> _mSwrCtx;
+  SwrContext* _mSwrCtx;
 
-//  AVGuard<uint8_t> _mSrcData;
-//  AVGuard<uint8_t> _mDstData;
+  int _mSrcNbSample;
+  int _mDstNbSample;
+  int _mMaxDstNbSample;
+
+  uint8_t** _mSrcData;
+  uint8_t** _mDstData;
+
+  int _mSrcLinesize;
+  int _mDstLinesize;
 
   AudioConfig _mSrcCfg;
   AudioConfig _mSinkCfg;
