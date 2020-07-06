@@ -47,16 +47,20 @@ protected:
 class AudioRecorder : public AVDataSourceBase {
 public:
   AudioRecorder();
-  ~AudioRecorder() = default;
+  ~AudioRecorder();
   
   int init(std::string& devName, std::string& inpName);
+
+  void uninit();
   
   int record();
   
 private:
-  std::unique_ptr<AVPacket> _mAVPkt;
+//  std::unique_ptr<AVPacket> _mAVPkt;
+  AVPacket* _mAVPkt;
 
-  AVGuard<AVFormatContext> _mFmtCtx;
+  // AVGuard<AVFormatContext> _mFmtCtx;
+  AVFormatContext* _mFmtCtx;
 };
 
 class AudioResample : public AVDataSourceBase
@@ -76,8 +80,8 @@ public:
 private:
   AVGuard<SwrContext> _mSwrCtx;
 
-  AVGuard<uint8_t> _mSrcData;
-  AVGuard<uint8_t> _mDstData;
+//  AVGuard<uint8_t> _mSrcData;
+//  AVGuard<uint8_t> _mDstData;
 
   AudioConfig _mSrcCfg;
   AudioConfig _mSinkCfg;

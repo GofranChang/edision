@@ -3,13 +3,17 @@
 namespace edision {
 
 AudioRecorder::AudioRecorder() : _mAVPkt(nullptr)
-                               , _mFmtCtx(avformat_close_input) {
+                               , _mFmtCtx(nullptr) {
+}
+
+AudioRecorder::~AudioRecorder() {
+  uninit();
 }
 
 int AudioRecorder::init(std::string& devName, std::string& inpName) {
   avdevice_register_all();
 
-  int ret = avformat_open_input(_mFmtCtx.get(), devName.c_str(), av_find_input_format(inpName.c_str()), NULL);
+  int ret = avformat_open_input(&_mFmtCtx, devName.c_str(), av_find_input_format(inpName.c_str()), NULL);
   if (ret < 0) {
     char errors[1024];
     av_strerror(ret, errors, 1024);
@@ -18,25 +22,44 @@ int AudioRecorder::init(std::string& devName, std::string& inpName) {
   }
   
   LOGI("A Recorder", "Open microphone {} success", devName);
-  _mAVPkt.reset(av_packet_alloc());
+  LOGI("A Recorder", "");
+
+  _mAVPkt = av_packet_alloc();
+  if (NULL == _mAVPkt) {
+    LOGE("A Recorder", "Alloc AVPacket error");
+    return -2;
+  }
 
   return 0;
 }
 
+void AudioRecorder::uninit() {
+  if (NULL != _mFmtCtx) {
+    avformat_close_input(&_mFmtCtx);
+  }
+  
+  if (NULL != _mAVPkt) {
+    av_packet_free(&_mAVPkt);
+  }
+}
+
+//void AudioRecorder::setDataSink(std::shared_ptr<DataSink> dataSink) {
+//  _mDataSink = dataSink;
+//}
+
 int AudioRecorder::record() {
   int ret = 0;
-  ret = av_read_frame(*(_mFmtCtx.get()), _mAVPkt.get());
+  ret = av_read_frame(_mFmtCtx, _mAVPkt);
   if (_mDataSink.get())  {
     _mDataSink->onData((uint8_t*)(_mAVPkt->data), _mAVPkt->size);
   }
   
-  av_packet_unref(_mAVPkt.get());
+  av_packet_unref(_mAVPkt);
   
   return ret;
 }
 
-AudioResample::AudioResample() : _mSwrCtx(swr_free)
-                                 {
+AudioResample::AudioResample() : _mSwrCtx(swr_free) {
 }
 
 int AudioResample::init(AudioConfig& inCfg, AudioConfig& outCfg) {
