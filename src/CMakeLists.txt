@@ -22,7 +22,16 @@ source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${AVCOMMON_SRC} ${AVDEVICE_SRC})
 
 #set_target_properties(audiocapture PROPERTIES RESOURCE "${PROJECT_SOURCE_DIR}/src/device/Info.plist")
 
-add_library(audiocapture ${AVDEVICE_SRC} ${AVCOMMON_SRC})
+add_library(edision ${AVDEVICE_SRC} ${AVCOMMON_SRC})
 # set_target_properties(audiocapture PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/src/device/Info.plist)
 
-target_link_libraries(audiocapture avformat avutil avdevice avcodec swresample logger)
+target_link_libraries(edision avformat avutil avdevice avcodec swresample logger)
+
+set(SAMPLE_SRC
+  ${PROJECT_SOURCE_DIR}/src/sample/main.cpp
+)
+
+add_executable(edisionTest ${SAMPLE_SRC})
+
+target_link_libraries(edisionTest edision)
+

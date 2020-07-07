@@ -22,27 +22,10 @@ extern "C" {
 
 #include "AVGuard.h"
 #include "AVConfig.h"
+#include "base/AVDataSinkBase.h"
+#include "base/AVDataSourceBase.h"
 
 namespace edision {
-
-class AVDataSinkBase {
-public:
-  virtual void onData(uint8_t* data, size_t size) = 0;
-};
-
-class AVDataSourceBase {
-public:
-  AVDataSourceBase() : _mDataSink(nullptr) {
-  }
-  ~AVDataSourceBase() = default;
-  
-  inline void setDataSink(AVDataSinkBase* dataSink) {
-    _mDataSink = dataSink;
-  }
-  
-protected:
-  AVDataSinkBase* _mDataSink;
-};
 
 class AudioRecorder : public AVDataSourceBase {
 public:
