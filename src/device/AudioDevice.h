@@ -1,5 +1,5 @@
-#ifndef __FFMPEGDEMO_AUDIO_DEVICE_H__
-#define __FFMPEGDEMO_AUDIO_DEVICE_H__
+#ifndef __EDISION_AUDIO_DEVICE_H__
+#define __EDISION_AUDIO_DEVICE_H__
 
 #include <iostream>
 #include <memory>
@@ -91,5 +91,5 @@ private:
 
 } // namespace edision
 
-#endif // __FFMPEGDEMO_AUDIO_DEVICE_H__
+#endif // __EDISION_AUDIO_DEVICE_H__
 

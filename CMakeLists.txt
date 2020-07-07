@@ -12,6 +12,8 @@ set(CMAKE_CXX_STANDARD 11)
 
 cmake_minimum_required(VERSION 2.8)
 
+include_directories("${PROJECT_SOURCE_DIR}/utils/log")
+
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
 include(CheckSymbolExists)
