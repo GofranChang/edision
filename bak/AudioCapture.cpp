@@ -46,7 +46,7 @@ int initEncoder(AVCodec** codec, AVCodecContext** codecCtx) {
   (*codecCtx)->sample_rate = 44100;
   (*codecCtx)->channel_layout = AV_CH_LAYOUT_MONO;
   (*codecCtx)->bit_rate = 64000;
-//  (*codecCtx)->profile = FF_PROFILE_AAC_HE_V2;
+ (*codecCtx)->profile = FF_PROFILE_AAC_HE_V2;
   
 //  avcodec_open2(*codecCtx, codec, NULL);
   ret = avcodec_open2(*codecCtx, *codec, NULL);

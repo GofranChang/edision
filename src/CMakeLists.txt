@@ -9,12 +9,15 @@ set(AVCOMMON_SRC
 set(AVDEVICE_SRC
   ${PROJECT_SOURCE_DIR}/src/device/AudioDevice.h
   ${PROJECT_SOURCE_DIR}/src/device/AudioDevice.cpp
+  ${PROJECT_SOURCE_DIR}/src/encoder/AudioEncoder.h
+  ${PROJECT_SOURCE_DIR}/src/encoder/AudioEncoder.cpp
   # ${PROJECT_SOURCE_DIR}/src/device/main.cpp
 )
 
 include_directories("${FFMPEG_DIR}/include")
 include_directories("${PROJECT_SOURCE_DIR}/src/common")
 include_directories("${PROJECT_SOURCE_DIR}/src/device")
+include_directories("${PROJECT_SOURCE_DIR}/src/encoder")
 
 link_directories("${FFMPEG_DIR}/lib")
 

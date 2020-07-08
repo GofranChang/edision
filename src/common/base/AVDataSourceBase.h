@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <memory>
 
 #include "AVDataSinkBase.h"
 
@@ -14,12 +15,12 @@ public:
   }
   ~AVDataSourceBase() = default;
   
-  inline void setDataSink(AVDataSinkBase* dataSink) {
+  inline void setDataSink(std::shared_ptr<AVDataSinkBase> dataSink) {
     _mDataSink = dataSink;
   }
   
 protected:
-  AVDataSinkBase* _mDataSink;
+  std::shared_ptr<AVDataSinkBase> _mDataSink;
 };
 
 } // namespace edision

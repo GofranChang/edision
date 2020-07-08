@@ -20,6 +20,7 @@ struct AudioConfig {
   int _mChannelNums;
   AVSampleFormat _mSampleFmt;
   int _mSampleRate;
+  int _mProfile;
 };
 
 } // namespace edision

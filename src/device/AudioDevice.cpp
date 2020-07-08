@@ -169,7 +169,7 @@ int AudioResampler::init(AudioConfig& inCfg, AudioConfig& outCfg, int srcNbSampl
 *                eg. In macos is "avfoundation"
 *
 */
-int AudioResampler::resample(uint8_t *data, size_t size) {
+int AudioResampler::resample(const uint8_t *data, size_t size) {
   if (NULL != _mSrcData) {
     memcpy((void *)_mSrcData[0], data, size);
     int ret = swr_convert(_mSwrCtx, _mDstData, _mDstNbSample, (const uint8_t **)_mSrcData, _mSrcNbSample);

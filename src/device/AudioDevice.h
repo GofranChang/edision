@@ -53,7 +53,7 @@ public:
   
   void uninit();
 
-  int resample(uint8_t* data, size_t size);
+  int resample(const uint8_t* data, size_t size);
 
 private:
   SwrContext* _mSwrCtx;
