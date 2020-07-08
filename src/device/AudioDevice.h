@@ -22,6 +22,7 @@ extern "C" {
 
 #include "AVGuard.h"
 #include "AVConfig.h"
+#include "AVError.h"
 #include "base/AVDataSinkBase.h"
 #include "base/AVDataSourceBase.h"
 
@@ -32,11 +33,11 @@ public:
   AudioRecorder();
   ~AudioRecorder();
   
-  int init(std::string& devName, std::string& inpName);
+  AV_RET init(std::string& devName, std::string& inpName);
 
   void uninit();
   
-  int record();
+  AV_RET record();
   
 private:
   AVPacket* _mAVPkt;
@@ -49,11 +50,11 @@ public:
   AudioResampler();
   ~AudioResampler();
 
-  int init(AudioConfig& inCfg, AudioConfig& outCfg, int srcNbSample);
+  AV_RET init(AudioConfig& inCfg, AudioConfig& outCfg, int srcNbSample);
   
   void uninit();
 
-  int resample(const uint8_t* data, size_t size);
+  AV_RET resample(const uint8_t* data, size_t size);
 
 private:
   SwrContext* _mSwrCtx;

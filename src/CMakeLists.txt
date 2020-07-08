@@ -2,6 +2,7 @@ set(AVCOMMON_SRC
   ${PROJECT_SOURCE_DIR}/src/common/AVGuard.h
   ${PROJECT_SOURCE_DIR}/src/common/AVGuard.cpp
   ${PROJECT_SOURCE_DIR}/src/common/AVConfig.h
+  ${PROJECT_SOURCE_DIR}/src/common/AVError.h
   ${PROJECT_SOURCE_DIR}/src/common/base/AVDataSinkBase.h
   ${PROJECT_SOURCE_DIR}/src/common/base/AVDataSourceBase.h
 )
@@ -11,7 +12,6 @@ set(AVDEVICE_SRC
   ${PROJECT_SOURCE_DIR}/src/device/AudioDevice.cpp
   ${PROJECT_SOURCE_DIR}/src/encoder/AudioEncoder.h
   ${PROJECT_SOURCE_DIR}/src/encoder/AudioEncoder.cpp
-  # ${PROJECT_SOURCE_DIR}/src/device/main.cpp
 )
 
 include_directories("${FFMPEG_DIR}/include")

@@ -37,7 +37,7 @@ AudioRecorder::~AudioRecorder() {
  *                eg. In macos is "avfoundation"
  *
  */
-int AudioRecorder::init(std::string& devName, std::string& inpName) {
+AV_RET AudioRecorder::init(std::string& devName, std::string& inpName) {
   avdevice_register_all();
 
   int ret = avformat_open_input(&_mFmtCtx, devName.c_str(), av_find_input_format(inpName.c_str()), NULL);
@@ -45,19 +45,18 @@ int AudioRecorder::init(std::string& devName, std::string& inpName) {
     char errors[1024];
     av_strerror(ret, errors, 1024);
     LOGE("A Recorder", "Open microphone error, error message \"{}\"", errors);
-    return -1;
+    return AV_OPEN_INPUT_ERR;
   }
   
   LOGI("A Recorder", "Open microphone {} success", devName);
-  LOGI("A Recorder", "");
 
   _mAVPkt = av_packet_alloc();
   if (NULL == _mAVPkt) {
     LOGE("A Recorder", "Alloc AVPacket error");
-    return -2;
+    return AV_ALLOC_PACKET_ERR;
   }
 
-  return 0;
+  return AV_SUCCESS;
 }
 
 /**
@@ -92,7 +91,7 @@ void AudioRecorder::uninit() {
 *                eg. In macos is "avfoundation"
 *
 */
-int AudioRecorder::record() {
+AV_RET AudioRecorder::record() {
   int ret = 0;
   ret = av_read_frame(_mFmtCtx, _mAVPkt);
   if (_mDataSink != nullptr)  {
@@ -101,7 +100,7 @@ int AudioRecorder::record() {
   
   av_packet_unref(_mAVPkt);
   
-  return ret;
+  return AV_SUCCESS;
 }
 
 /**
@@ -132,7 +131,7 @@ AudioResampler::~AudioResampler() {
 *                eg. In macos is "avfoundation"
 *
 */
-int AudioResampler::init(AudioConfig& inCfg, AudioConfig& outCfg, int srcNbSample) {
+AV_RET AudioResampler::init(AudioConfig& inCfg, AudioConfig& outCfg, int srcNbSample) {
   _mSrcCfg = inCfg;
   _mSinkCfg = outCfg;
 
@@ -141,12 +140,12 @@ int AudioResampler::init(AudioConfig& inCfg, AudioConfig& outCfg, int srcNbSampl
   
   if (NULL == _mSwrCtx) {
     LOGE("A Resample", "Alloc swrcontext error");
-    return -1;
+    return AV_ALLOC_SWR_CTX_ERR;
   }
   
   if (swr_init(_mSwrCtx)) {
     LOGE("A Resample", "Init swr context error");
-    return -2;
+    return AV_ALLOC_SWR_CTX_ERR;
   }
   
   // allocate src & dst buffer
@@ -157,7 +156,7 @@ int AudioResampler::init(AudioConfig& inCfg, AudioConfig& outCfg, int srcNbSampl
   
   int dst_buf_size = av_samples_alloc_array_and_samples(&_mDstData, &_mDstLinesize, _mSinkCfg._mChannelNums, _mDstNbSample, _mSinkCfg._mSampleFmt, 0);
   
-  return 0;
+  return AV_SUCCESS;
 }
 
 /**
@@ -169,7 +168,7 @@ int AudioResampler::init(AudioConfig& inCfg, AudioConfig& outCfg, int srcNbSampl
 *                eg. In macos is "avfoundation"
 *
 */
-int AudioResampler::resample(const uint8_t *data, size_t size) {
+AV_RET AudioResampler::resample(const uint8_t *data, size_t size) {
   if (NULL != _mSrcData) {
     memcpy((void *)_mSrcData[0], data, size);
     int ret = swr_convert(_mSwrCtx, _mDstData, _mDstNbSample, (const uint8_t **)_mSrcData, _mSrcNbSample);
@@ -177,10 +176,10 @@ int AudioResampler::resample(const uint8_t *data, size_t size) {
     if (_mDataSink != nullptr)
       _mDataSink->onData(_mDstData[0], _mDstLinesize);
   
-    return ret;
+    return AV_SUCCESS;
   }
   
-  return -1;
+  return AV_MEM_EMPTY;
 }
 
 void AudioResampler::uninit() {

@@ -21,6 +21,7 @@ extern "C" {
 #include "base/AVDataSinkBase.h"
 #include "base/AVDataSourceBase.h"
 #include "AVConfig.h"
+#include "AVError.h"
 
 namespace edision {
 
@@ -31,13 +32,13 @@ public:
   AudioEncoder();
   ~AudioEncoder();
 
-  int init(std::string& codecName, AudioConfig& config);
+  AV_RET init(std::string& codecName, AudioConfig& config);
   
   void uninit();
 
   void recvThreadFun();
 
-  int encode(const uint8_t* data, size_t size);
+  AV_RET encode(const uint8_t* data, size_t size);
 
 private:
   AVCodecContext* _mCodecCtx;
