@@ -1,4 +1,5 @@
 #include "AudioDevice.h"
+#include "VideoDevice.h"
 #include "MyLogger.h"
 #include "AudioEncoder.h"
 
@@ -61,6 +62,8 @@ int main(int argc, const char* argv[]) {
   auto logger = my_media::KooLogger::Instance();
   logger->initLogger(spdlog::level::debug, true, "", false);
   
+  // Audio Encoder test
+#if 0
   AudioRecorder recorder;
   std::string devName = ":0";
   std::string inpName = "avfoundation";
@@ -105,6 +108,22 @@ int main(int argc, const char* argv[]) {
   
   fflush(gFout);
   fclose(gFout);
+#endif
+
+  // Video Recoder test
+  VideoRecorder vRec;
+  std::string devName = "0";
+  std::string inpName = "avfoundation";
+  vRec.init(devName, inpName);
+
+  std::shared_ptr<MyEncodedDataSink> recDataSink(new MyEncodedDataSink);
+  vRec.setDataSink(recDataSink);
+
+  gFout = fopen("/Users/gofran/Documents/workspace/gitproj/FfmpegDemo/resource/newout.yuv", "wb+");
+  for (int i = 0; i < 500; i++) {
+//  while (1) {
+    vRec.record();
+  }
   
   return 0;
 }

@@ -10,6 +10,8 @@ set(AVCOMMON_SRC
 set(AVDEVICE_SRC
   ${PROJECT_SOURCE_DIR}/src/device/AudioDevice.h
   ${PROJECT_SOURCE_DIR}/src/device/AudioDevice.cpp
+  ${PROJECT_SOURCE_DIR}/src/device/VideoDevice.h
+  ${PROJECT_SOURCE_DIR}/src/device/VideoDevice.cpp
   ${PROJECT_SOURCE_DIR}/src/encoder/AudioEncoder.h
   ${PROJECT_SOURCE_DIR}/src/encoder/AudioEncoder.cpp
 )

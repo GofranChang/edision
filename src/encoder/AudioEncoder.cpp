@@ -17,8 +17,7 @@ AudioEncoder::~AudioEncoder() {
 
 AV_RET AudioEncoder::init(std::string& codecName, AudioConfig& config) {
   avcodec_register_all();
-  
-  //TODO: Judge if alloc success
+
   _mCodec = avcodec_find_encoder_by_name(codecName.c_str());
   if (NULL == _mCodec) {
     LOGE("A Encoder", "Find encoder \"{}\" failed", codecName);
