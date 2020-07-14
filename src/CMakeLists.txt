@@ -2,6 +2,7 @@ set(AVCOMMON_SRC
   ${PROJECT_SOURCE_DIR}/src/common/AVGuard.h
   ${PROJECT_SOURCE_DIR}/src/common/AVGuard.cpp
   ${PROJECT_SOURCE_DIR}/src/common/AVConfig.h
+  ${PROJECT_SOURCE_DIR}/src/common/AVConfig.cpp
   ${PROJECT_SOURCE_DIR}/src/common/AVError.h
   ${PROJECT_SOURCE_DIR}/src/common/base/AVDataSinkBase.h
   ${PROJECT_SOURCE_DIR}/src/common/base/AVDataSourceBase.h

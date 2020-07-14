@@ -33,7 +33,7 @@ public:
   VideoRecorder();
   ~VideoRecorder();
 
-  AV_RET init(std::string& devName, std::string& inpName);
+  AV_RET init(std::string& devName, std::string& inpName, VideoConfig& cfg);
 
   void uninit();
 
@@ -43,6 +43,12 @@ private:
   AVPacket* _mAVPkt;
 
   AVFormatContext* _mFmtCtx;
+
+  AVDictionary* _mVideoOptionals;
+
+  VideoConfig _mVideoCfg;
+
+  int _mFrameSize;
 };
 
 } // namespace edision

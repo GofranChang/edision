@@ -114,12 +114,17 @@ int main(int argc, const char* argv[]) {
   VideoRecorder vRec;
   std::string devName = "0";
   std::string inpName = "avfoundation";
-  vRec.init(devName, inpName);
+  VideoConfig vCfg;
+  vCfg._mFmt = VIDEO_NV12;
+  vCfg._mWidth = 640;
+  vCfg._mHigh = 480;
+  vCfg._mFrameRate = 30;
+  vRec.init(devName, inpName, vCfg);
 
   std::shared_ptr<MyEncodedDataSink> recDataSink(new MyEncodedDataSink);
   vRec.setDataSink(recDataSink);
 
-  gFout = fopen("/Users/gofran/Documents/workspace/gitproj/FfmpegDemo/resource/newout.yuv", "wb+");
+  gFout = fopen("/Users/gofran/Documents/workspace/gitproj/edision/resource/newout.yuv", "wb+");
   for (int i = 0; i < 500; i++) {
 //  while (1) {
     vRec.record();
