@@ -1,3 +1,16 @@
+/*
+ * copyright (c) 2020 Gofran Chang
+ * 
+ * FileName: AVError.h
+ * 
+ * Author  : Gofran Chang
+ * E-mail  : zhanggaofan0827@gmail.com
+ * 
+ * Date    : 2020-07-16
+ *
+ * This file is part of Edision.
+ */
+
 #ifndef __EDISION_COMMON_AV_ERROR_H__
 #define __EDISION_COMMON_AV_ERROR_H__
 
