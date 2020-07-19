@@ -47,6 +47,9 @@ public:
   AV_RET setConfig(std::shared_ptr<MediaConfig> config) override;
   
   AV_RET encode(const uint8_t* data, size_t size) override;
+  
+private:
+  int _mPts;
 };
 
 }

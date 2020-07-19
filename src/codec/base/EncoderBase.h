@@ -57,35 +57,6 @@ protected:
   AVPacket* _mPacket;
 };
 
-/*
-class AudioDataSource;
-
-class AudioEncoder : public AVDataSourceBase {
-public:
-  AudioEncoder();
-  ~AudioEncoder();
-
-  AV_RET init(std::string& codecName, AudioConfig& config);
-  
-  void uninit();
-
-  void recvThreadFun();
-
-  AV_RET encode(const uint8_t* data, size_t size);
-
-private:
-  AVCodecContext* _mCodecCtx;
-  AVCodec *_mCodec;
-  AudioConfig _mConfig;
-
-  AVFrame* _mFrame;
-  AVPacket* _mPacket;
-
-private:
-  std::thread _mRecvThread;
-};
-*/
-
 }
 
 #endif //__EDISION_CODEC_ENCODERBASE_H__

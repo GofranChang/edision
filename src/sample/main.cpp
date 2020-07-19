@@ -20,6 +20,8 @@ using namespace edision;
 
 static FILE* gFout = nullptr;
 
+//////////////////////////////////////////////////////
+// Audio Sink
 class MyRecDataSink : public AVDataSinkBase {
 public:
   virtual void onData(uint8_t* data, size_t size) override;
@@ -31,6 +33,12 @@ private:
   std::shared_ptr<AudioResampler> _mResampler;
 };
 
+void MyRecDataSink::onData(uint8_t *data, size_t size) {
+  _mResampler->resample(data, size);
+//  LOGD("Main", "onData, size ({})", size);
+//  if (gFout)
+//    fwrite(data, 1, size, gFout);
+}
 
 class MyResampleDataSink : public AVDataSinkBase {
 public:
@@ -43,20 +51,6 @@ private:
   std::shared_ptr<EncoderBase> _mEncoder;
 };
 
-class MyEncodedDataSink : public AVDataSinkBase {
-public:
-  virtual void onData(uint8_t* data, size_t size) override;
-};
-
-
-void MyRecDataSink::onData(uint8_t *data, size_t size) {
-  _mResampler->resample(data, size);
-//  LOGD("Main", "onData, size ({})", size);
-//  if (gFout)
-//    fwrite(data, 1, size, gFout);
-}
-
-
 void MyResampleDataSink::onData(uint8_t *data, size_t size) {
   // LOGD("Main", "onData, size ({})", size);
   // if (gFout)
@@ -64,6 +58,29 @@ void MyResampleDataSink::onData(uint8_t *data, size_t size) {
   _mEncoder->encode(data, size);
 }
 
+
+//////////////////////////////////////////////////////
+// Video Sink
+class MyCaptureDataSink : public AVDataSinkBase {
+public:
+  virtual void onData(uint8_t* data, size_t size) override;
+  inline void setEncoder(std::shared_ptr<EncoderBase> ecdr) {
+    _mEncoder = ecdr;
+  }
+
+private:
+  std::shared_ptr<EncoderBase> _mEncoder;
+};
+
+void MyCaptureDataSink::onData(uint8_t *data, size_t size) {
+  if (_mEncoder.get())
+    _mEncoder->encode(data, size);
+}
+
+class MyEncodedDataSink : public AVDataSinkBase {
+public:
+  virtual void onData(uint8_t* data, size_t size) override;
+};
 
 void MyEncodedDataSink::onData(uint8_t* data, size_t size) {
   LOGD("Main", "onData, size ({})", size);
@@ -76,7 +93,7 @@ int main(int argc, const char* argv[]) {
   logger->initLogger(spdlog::level::debug, true, "", false);
   
   // Audio Encoder test
-#if 1
+#if 0
   AudioRecorder recorder;
   std::string devName = ":0";
   std::string inpName = "avfoundation";
@@ -133,7 +150,7 @@ int main(int argc, const char* argv[]) {
   fclose(gFout);
 #endif
 
-#if 0
+#if 1
   // Video Recoder test
   VideoRecorder vRec;
   std::string devName = "0";
@@ -145,10 +162,30 @@ int main(int argc, const char* argv[]) {
   vCfg._mFrameRate = 30;
   vRec.init(devName, inpName, vCfg);
 
+  std::shared_ptr<MyCaptureDataSink> capDataSink(new MyCaptureDataSink);
   std::shared_ptr<MyEncodedDataSink> recDataSink(new MyEncodedDataSink);
-  vRec.setDataSink(recDataSink);
+  
+  std::shared_ptr<H264Config> VEncoderCfg(new H264Config);
+  VEncoderCfg->_mFmt = AV_PIX_FMT_NV12;
+  VEncoderCfg->_mWidth = 640;
+  VEncoderCfg->_mHeight = 480;
+  VEncoderCfg->_mFrameRate = 30;
+  VEncoderCfg->_mProfile = FF_PROFILE_H264_HIGH;
+  VEncoderCfg->_mLevel = 50;
+  VEncoderCfg->_mGopSize = 25;
+  VEncoderCfg->_mBitRate = 1000 * 1024;
+  
+  std::string encoderName = "libx264";
+  std::shared_ptr<EncoderBase> encoder(EncoderBase::createNew(VIDEO, encoderName));
+  encoder->init();
+  //  std::shared_ptr<AudioConfig> AEncoderCfg(&outCfg);
+  encoder->setConfig(VEncoderCfg);
+  encoder->setDataSink(recDataSink);
+  
+  capDataSink->setEncoder(encoder);
+  vRec.setDataSink(capDataSink);
 
-  gFout = fopen("/Users/gofran/Documents/workspace/gitproj/edision/resource/newout.yuv", "wb+");
+  gFout = fopen("/Users/gofran/Documents/workspace/gitproj/edision/resource/newout.h264", "wb+");
   for (int i = 0; i < 500; i++) {
 //  while (1) {
     vRec.record();
