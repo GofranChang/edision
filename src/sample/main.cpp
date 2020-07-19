@@ -35,12 +35,12 @@ private:
 class MyResampleDataSink : public AVDataSinkBase {
 public:
   virtual void onData(uint8_t* data, size_t size) override;
-  inline void setEncoder(std::shared_ptr<AudioEncoder> ecdr) {
+  inline void setEncoder(std::shared_ptr<EncoderBase> ecdr) {
     _mEncoder = ecdr;
   }
 
 private:
-  std::shared_ptr<AudioEncoder> _mEncoder;
+  std::shared_ptr<EncoderBase> _mEncoder;
 };
 
 class MyEncodedDataSink : public AVDataSinkBase {
@@ -76,7 +76,7 @@ int main(int argc, const char* argv[]) {
   logger->initLogger(spdlog::level::debug, true, "", false);
   
   // Audio Encoder test
-#if 0
+#if 1
   AudioRecorder recorder;
   std::string devName = ":0";
   std::string inpName = "avfoundation";
@@ -99,21 +99,31 @@ int main(int argc, const char* argv[]) {
   outCfg._mSampleFmt = AV_SAMPLE_FMT_S16;
   outCfg._mSampleRate = 48000;
   
+  std::shared_ptr<AudioConfig> AEncoderCfg(new AudioConfig);
+  AEncoderCfg->_mChannelLayout = AV_CH_LAYOUT_STEREO;
+  AEncoderCfg->_mChannelNums = 2;
+  AEncoderCfg->_mSampleFmt = AV_SAMPLE_FMT_S16;
+  AEncoderCfg->_mSampleRate = 48000;
+
+  
   resampler->init(inCfg, outCfg, 512);
   recDataSink->setResampler(resampler);
   
   std::shared_ptr<MyResampleDataSink> resampleSink(new MyResampleDataSink);
   resampler->setDataSink(resampleSink);
 
-  std::shared_ptr<AudioEncoder> encoder(new AudioEncoder);
   std::string encoderName = "libfdk_aac";
-  encoder->init(encoderName, outCfg);
+  std::shared_ptr<EncoderBase> encoder(EncoderBase::createNew(AUDIO, encoderName));
+  encoder->init();
+//  std::shared_ptr<AudioConfig> AEncoderCfg(&outCfg);
+  encoder->setConfig(AEncoderCfg);
+  
   resampleSink->setEncoder(encoder);
   
   std::shared_ptr<MyEncodedDataSink> encoderSink(new MyEncodedDataSink);
   encoder->setDataSink(encoderSink);
   
-  gFout = fopen("/Users/gofran/Documents/workspace/gitproj/FfmpegDemo/resource/newout.aac", "wb+");
+  gFout = fopen("/Users/gofran/Documents/workspace/gitproj/edision/resource/newout.aac", "wb+");
   for (int i = 0; i < 500; i++) {
 //  while (1) {
     recorder.record();
@@ -123,14 +133,15 @@ int main(int argc, const char* argv[]) {
   fclose(gFout);
 #endif
 
+#if 0
   // Video Recoder test
   VideoRecorder vRec;
   std::string devName = "0";
   std::string inpName = "avfoundation";
   VideoConfig vCfg;
-  vCfg._mFmt = VIDEO_NV12;
+  vCfg._mFmt = AV_PIX_FMT_NV12;
   vCfg._mWidth = 640;
-  vCfg._mHigh = 480;
+  vCfg._mHeight = 480;
   vCfg._mFrameRate = 30;
   vRec.init(devName, inpName, vCfg);
 
@@ -142,6 +153,7 @@ int main(int argc, const char* argv[]) {
 //  while (1) {
     vRec.record();
   }
+#endif
   
   return 0;
 }
