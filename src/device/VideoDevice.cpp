@@ -1,3 +1,16 @@
+/*
+ * copyright (c) 2020 Gofran Chang
+ * 
+ * FileName: VideoDevice.cpp
+ * 
+ * Author  : Gofran Chang
+ * E-mail  : zhanggaofan0827@gmail.com
+ * 
+ * Date    : 2020-07-16
+ *
+ * This file is part of Edision.
+ */
+
 #include "VideoDevice.h"
 
 namespace edision {
@@ -47,7 +60,7 @@ AV_RET VideoRecorder::init(std::string& devName, std::string& inpName, VideoConf
   // Set resolution
   char resolution[32];
   memset(resolution, '\0', 32);
-  sprintf(resolution, "%dx%d", _mVideoCfg._mWidth, _mVideoCfg._mHigh);
+  sprintf(resolution, "%dx%d", _mVideoCfg._mWidth, _mVideoCfg._mHeight);
   av_dict_set(&_mVideoOptionals, "video_size", resolution, 0);
 
   // Set frame rate
@@ -59,18 +72,18 @@ AV_RET VideoRecorder::init(std::string& devName, std::string& inpName, VideoConf
   av_dict_set(&_mVideoOptionals, "pixel_format", VideoConfig::_mFmtUpon[_mVideoCfg._mFmt].c_str(), 0);
 
   switch (_mVideoCfg._mFmt) {
-  case VIDEO_YUV444:
-    _mFrameSize = _mVideoCfg._mWidth * _mVideoCfg._mHigh * 3;
+  case AV_PIX_FMT_YUV444P:
+    _mFrameSize = _mVideoCfg._mWidth * _mVideoCfg._mHeight * 3;
     break;
 
-  case VIDEO_YUV422:
-  case VIDEO_UYVY422:
-    _mFrameSize = _mVideoCfg._mWidth * _mVideoCfg._mHigh * 2;
+  case AV_PIX_FMT_UYVY422:
+  case AV_PIX_FMT_YUV422P:
+    _mFrameSize = _mVideoCfg._mWidth * _mVideoCfg._mHeight * 2;
     break;
 
-  case VIDEO_NV12:
-  case VIDEO_NV21:
-    _mFrameSize = _mVideoCfg._mWidth * _mVideoCfg._mHigh * 3 / 2;
+  case AV_PIX_FMT_NV12:
+  case AV_PIX_FMT_NV21:
+    _mFrameSize = _mVideoCfg._mWidth * _mVideoCfg._mHeight * 3 / 2;
     break;
 
   default:

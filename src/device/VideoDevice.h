@@ -1,3 +1,16 @@
+/*
+ * copyright (c) 2020 Gofran Chang
+ * 
+ * FileName: VideoDevice.h
+ * 
+ * Author  : Gofran Chang
+ * E-mail  : zhanggaofan0827@gmail.com
+ * 
+ * Date    : 2020-07-16
+ *
+ * This file is part of Edision.
+ */
+
 #ifndef __EDISION_VIDEO_DEVICE_H__
 #define __EDISION_VIDEO_DEVICE_H__
 

@@ -13,14 +13,19 @@ set(AVDEVICE_SRC
   ${PROJECT_SOURCE_DIR}/src/device/AudioDevice.cpp
   ${PROJECT_SOURCE_DIR}/src/device/VideoDevice.h
   ${PROJECT_SOURCE_DIR}/src/device/VideoDevice.cpp
-  ${PROJECT_SOURCE_DIR}/src/encoder/AudioEncoder.h
-  ${PROJECT_SOURCE_DIR}/src/encoder/AudioEncoder.cpp
+  ${PROJECT_SOURCE_DIR}/src/codec/AudioEncoder.h
+  ${PROJECT_SOURCE_DIR}/src/codec/AudioEncoder.cpp
+  ${PROJECT_SOURCE_DIR}/src/codec/VideoEncoder.h
+  ${PROJECT_SOURCE_DIR}/src/codec/VideoEncoder.cpp
+  ${PROJECT_SOURCE_DIR}/src/codec/base/EncoderBase.h
+  ${PROJECT_SOURCE_DIR}/src/codec/base/EncoderBase.cpp
 )
 
 include_directories("${FFMPEG_DIR}/include")
 include_directories("${PROJECT_SOURCE_DIR}/src/common")
 include_directories("${PROJECT_SOURCE_DIR}/src/device")
-include_directories("${PROJECT_SOURCE_DIR}/src/encoder")
+include_directories("${PROJECT_SOURCE_DIR}/src/codec")
+include_directories("${PROJECT_SOURCE_DIR}/src/codec/base")
 
 link_directories("${FFMPEG_DIR}/lib")
 
