@@ -83,6 +83,7 @@ AV_RET VideoRecorder::init(std::string& devName, std::string& inpName, VideoConf
 
   case AV_PIX_FMT_NV12:
   case AV_PIX_FMT_NV21:
+  case AV_PIX_FMT_YUV420P:
     _mFrameSize = _mVideoCfg._mWidth * _mVideoCfg._mHeight * 3 / 2;
     break;
 
@@ -149,7 +150,7 @@ AV_RET VideoRecorder::record() {
   int ret = 0;
   ret = av_read_frame(_mFmtCtx, _mAVPkt);
   if (_mDataSink != nullptr)  {
-    _mDataSink->onData((uint8_t*)(_mAVPkt->data), _mFrameSize);
+    _mDataSink->onData((uint8_t*)(_mAVPkt->data) + 32, _mFrameSize);
   }
   
   av_packet_unref(_mAVPkt);

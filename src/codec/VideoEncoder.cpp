@@ -64,7 +64,7 @@ AV_RET VideoEncoder::setConfig(std::shared_ptr<MediaConfig> config) {
   }
 
   //TODO: Modify this value later
-  _mFrame->format = AV_PIX_FMT_NV12;
+  _mFrame->format = vConfig->_mFmt;
   _mFrame->width = vConfig->_mWidth;
   _mFrame->height = vConfig->_mHeight;
   av_frame_get_buffer(_mFrame, 0);
