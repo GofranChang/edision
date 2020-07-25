@@ -30,20 +30,26 @@ AV_RET VideoEncoder::setConfig(std::shared_ptr<MediaConfig> config) {
   _mConfig = config;
   H264Config* vConfig = static_cast<H264Config*>(_mConfig.get());
   
-  // Resolution
-  _mCodecCtx->width = vConfig->_mWidth;
-  _mCodecCtx->height = vConfig->_mHeight;
-  
   // Profile & level
   _mCodecCtx->profile = vConfig->_mProfile;
   _mCodecCtx->level = vConfig->_mLevel;
-  
-  // Source format
-  _mCodecCtx->pix_fmt = vConfig->_mFmt;
-  
+    
+  // Resolution
+  _mCodecCtx->width = vConfig->_mWidth;
+  _mCodecCtx->height = vConfig->_mHeight;
+
   // Gop
-  _mCodecCtx->gop_size = vConfig->_mGopSize;
-  
+  //  _mCodecCtx->gop_size = vConfig->_mGopSize;
+  _mCodecCtx->gop_size = 250;
+  _mCodecCtx->keyint_min = 25;
+
+  _mCodecCtx->max_b_frames = 3; //option
+  _mCodecCtx->has_b_frames = 1; //option
+  _mCodecCtx->refs = 3;
+
+  // Source format
+  _mCodecCtx->pix_fmt = AV_PIX_FMT_YUV420P;
+
   // Bitrate
   _mCodecCtx->bit_rate = vConfig->_mBitRate;
   
@@ -64,10 +70,10 @@ AV_RET VideoEncoder::setConfig(std::shared_ptr<MediaConfig> config) {
   }
 
   //TODO: Modify this value later
-  _mFrame->format = vConfig->_mFmt;
+  _mFrame->format = AV_PIX_FMT_YUV420P;
   _mFrame->width = vConfig->_mWidth;
   _mFrame->height = vConfig->_mHeight;
-  av_frame_get_buffer(_mFrame, 0);
+  av_frame_get_buffer(_mFrame, 32);
   if (NULL == _mFrame || NULL == _mFrame->buf[0]) {
     LOGE("A Encoder", "Alloc AVFrame failed");
     return AV_ALLOC_FRAME_ERR;

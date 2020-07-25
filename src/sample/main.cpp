@@ -71,10 +71,48 @@ public:
 private:
   std::shared_ptr<EncoderBase> _mEncoder;
 };
-
+  
 void MyCaptureDataSink::onData(uint8_t *data, size_t size) {
+  uint8_t* revert = new uint8_t[size];
+  
+#if 0
+  memcpy(revert, data, 307200); //copy Y data
+  //307200之后，是UV
+  for(int i=0; i < 307200/4; i++){
+//      frame->data[1][i] = pkt.data[307200+i*2];
+//      frame->data[2][i] = pkt.data[307201+i*2];
+    revert[307200 + i] = data[307200+i*2];
+    revert[307201 + i] = data[307201+i*2];
+  }
+#endif
+  
+  
+  memcpy(revert, data, 307200);
+
+
+  //u
+  int i =0;
+  for (int j =0; j < 307200 /2; j +=2) {
+    revert[307200 + i] = data[307200 + j];
+    i++;
+  }
+
+  //v
+  i =0;
+  for (int j =1; j < 307200 /2; j+=2) {
+    revert[307200 *5 /4 + i] = data[307200 + j];
+    i++;
+  }
+  
+  
+  
+  
+  
+  
   if (_mEncoder.get())
-    _mEncoder->encode(data, size);
+    _mEncoder->encode(revert, size);
+  
+  delete[] revert;
 }
 
 class MyEncodedDataSink : public AVDataSinkBase {
@@ -150,7 +188,7 @@ int main(int argc, const char* argv[]) {
   fclose(gFout);
 #endif
 
-#if 1
+#if 0
   // Video Recoder test
   VideoRecorder vRec;
   std::string devName = "0";
@@ -166,7 +204,7 @@ int main(int argc, const char* argv[]) {
   std::shared_ptr<MyEncodedDataSink> recDataSink(new MyEncodedDataSink);
   
   std::shared_ptr<H264Config> VEncoderCfg(new H264Config);
-  VEncoderCfg->_mFmt = AV_PIX_FMT_NV12;
+  VEncoderCfg->_mFmt = AV_PIX_FMT_YUV420P;
   VEncoderCfg->_mWidth = 640;
   VEncoderCfg->_mHeight = 480;
   VEncoderCfg->_mFrameRate = 30;
@@ -183,6 +221,7 @@ int main(int argc, const char* argv[]) {
   encoder->setDataSink(recDataSink);
   
   capDataSink->setEncoder(encoder);
+//  vRec.setDataSink(recDataSink);
   vRec.setDataSink(capDataSink);
 
   gFout = fopen("/Users/gofran/Documents/workspace/gitproj/edision/resource/newout.h264", "wb+");
@@ -191,6 +230,47 @@ int main(int argc, const char* argv[]) {
     vRec.record();
   }
 #endif
+  
+  
+  /* Initialize encoder */
+  std::string encoderName = "libx264";
+  std::shared_ptr<EncoderBase> encoder(EncoderBase::createNew(VIDEO, encoderName));
+  encoder->init();
+  
+  std::shared_ptr<H264Config> VEncoderCfg(new H264Config);
+  VEncoderCfg->_mFmt = AV_PIX_FMT_YUV420P;
+  VEncoderCfg->_mWidth = 640;
+  VEncoderCfg->_mHeight = 480;
+  VEncoderCfg->_mFrameRate = 30;
+  VEncoderCfg->_mProfile = FF_PROFILE_H264_HIGH_444;
+  VEncoderCfg->_mLevel = 50;
+  VEncoderCfg->_mGopSize = 25;
+  VEncoderCfg->_mBitRate = 1000 * 1024;
+  
+  std::shared_ptr<MyEncodedDataSink> recDataSink(new MyEncodedDataSink);
+  
+  encoder->setConfig(VEncoderCfg);
+  encoder->setDataSink(recDataSink);
+  
+  FILE* inputYuv = fopen("/Users/gofran/Documents/workspace/gitproj/edision/build/video.yuv", "rb+");
+  if (nullptr == inputYuv) {
+    LOGE("Main", "Open input yuv failed, {}", strerror(errno));
+    return -1;
+  }
+  
+  gFout = fopen("/Users/gofran/Documents/workspace/gitproj/edision/build/newout.h264", "wb+");
+  
+  int ret = 0;
+  uint8_t readBuf[1382400];
+  memset(readBuf, 0, 640 * 480 * 3 / 2);
+  while (!feof(inputYuv)) {
+    ret = fread(readBuf, 1, 640 * 480 * 3 / 2, inputYuv);
+    
+    encoder->encode(readBuf, 640 * 480 * 3 / 2);
+  }
+  
+  fclose(inputYuv);
+  fclose(gFout);
   
   return 0;
 }
