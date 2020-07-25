@@ -18,6 +18,7 @@
 
 namespace edision {
 
+#if 0
 AudioEncoder::AudioEncoder(std::string& codecName) : EncoderBase(codecName) {
 }
 
@@ -88,5 +89,6 @@ AV_RET AudioEncoder::encode(const uint8_t* data, size_t size) {
 
   return AV_SUCCESS;
 }
+#endif
 
 } // namespace edision

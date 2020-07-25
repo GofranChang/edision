@@ -39,16 +39,20 @@ extern "C" {
 
 namespace edision {
 
-class AudioEncoder : public EncoderBase {
+#if 0
+// TODO: Modify this later
+class AudioEncoder {
 public:
   AudioEncoder(std::string& codecName);
   ~AudioEncoder();
 
 public:
-  AV_RET setConfig(std::shared_ptr<MediaConfig> config) override;
+  AV_RET setConfig(std::shared_ptr<MediaConfig> config);
   
-  AV_RET encode(const uint8_t* data, size_t size) override;
+  AV_RET encode(const uint8_t* data, size_t size);
 };
+
+#endif
 
 }
 

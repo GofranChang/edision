@@ -16,6 +16,7 @@
 #include "MyLogger.h"
 #include "AudioEncoder.h"
 
+#if 1
 using namespace edision;
 
 static FILE* gFout = nullptr;
@@ -234,9 +235,39 @@ int main(int argc, const char* argv[]) {
   
   /* Initialize encoder */
   std::string encoderName = "libx264";
-  std::shared_ptr<EncoderBase> encoder(EncoderBase::createNew(VIDEO, encoderName));
+  std::shared_ptr<EncoderBase> encoder(EncoderBase::createNew(VIDEO_ENCODER, encoderName));
   encoder->init();
   
+  std::shared_ptr<YUVFormat> inputFmt(new YUVFormat(AV_PIX_FMT_YUV420P, 1280, 720));
+  
+  std::shared_ptr<H264Format> outputFmt(new H264Format(1280, 720));
+  outputFmt->_mBitRate = 1000 * 1024;
+  outputFmt->_mProfile = FF_PROFILE_H264_HIGH_444;
+  outputFmt->_mFrameRate = 50;
+  outputFmt->_mGopSize = 25;
+  
+  encoder->setConfig(inputFmt, outputFmt);
+  
+  std::shared_ptr<MyEncodedDataSink> recDataSink(new MyEncodedDataSink);
+  encoder->setDataSink(recDataSink);
+  
+  FILE* inputYuv = fopen("/Users/gofran/Documents/workspace/gitproj/edision/build/ConferenceMotion_1280_720_50.yuv", "rb+");
+  if (nullptr == inputYuv) {
+    LOGE("Main", "Open input yuv failed, {}", strerror(errno));
+    return -1;
+  }
+  
+  gFout = fopen("/Users/gofran/Documents/workspace/gitproj/edision/build/newout.h264", "wb+");
+
+  int ret = 0;
+  uint8_t readBuf[1382400];
+  memset(readBuf, 0, 1280 * 720 * 3 / 2);
+  while (!feof(inputYuv)) {
+    ret = fread(readBuf, 1, 1280 * 720 * 3 / 2, inputYuv);
+    
+    encoder->encode(readBuf, 1280 * 720 * 3 / 2);
+  }
+  /*
   std::shared_ptr<H264Config> VEncoderCfg(new H264Config);
   VEncoderCfg->_mFmt = AV_PIX_FMT_YUV420P;
   VEncoderCfg->_mWidth = 640;
@@ -249,7 +280,7 @@ int main(int argc, const char* argv[]) {
   
   std::shared_ptr<MyEncodedDataSink> recDataSink(new MyEncodedDataSink);
   
-  encoder->setConfig(VEncoderCfg);
+//  encoder->setConfig(VEncoderCfg);
   encoder->setDataSink(recDataSink);
   
   FILE* inputYuv = fopen("/Users/gofran/Documents/workspace/gitproj/edision/build/video.yuv", "rb+");
@@ -268,9 +299,36 @@ int main(int argc, const char* argv[]) {
     
     encoder->encode(readBuf, 640 * 480 * 3 / 2);
   }
+   */
   
   fclose(inputYuv);
   fclose(gFout);
   
   return 0;
 }
+#endif
+
+/*
+class Base {
+public:
+  Base(std::string str) {
+    std::cout << "Base construct : " << str << std::endl;
+  }
+};
+
+class Derive : public Base {
+public:
+  Derive(std::string str) : Base(str) {
+    std::cout << "Derive construct : " << str << std::endl;
+  }
+};
+
+int main(int argc, const char* argv[]) {
+//  Derive d("Test1");
+  
+  Base* b = new Base("Test2");
+  Derive* d2 = static_cast<Derive*>(b);
+  
+  return 0;
+}
+ */

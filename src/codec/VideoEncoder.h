@@ -16,6 +16,8 @@
 
 #include <string>
 #include <thread>
+#include <vector>
+#include <utility>
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,12 +46,15 @@ public:
   VideoEncoder(std::string& codecName);
   ~VideoEncoder();
 
-  AV_RET setConfig(std::shared_ptr<MediaConfig> config) override;
+  AV_RET setConfig(std::shared_ptr<AVFormatBase> srcFmt, std::shared_ptr<AVFormatBase> dstFmt) override;
   
   AV_RET encode(const uint8_t* data, size_t size) override;
   
 private:
   int _mPts;
+//  std::unordered_map<int, int> _mOffserSize;
+  std::vector<std::pair<int, int>> _mOffsetSize;
+
 };
 
 }

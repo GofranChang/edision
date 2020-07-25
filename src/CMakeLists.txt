@@ -4,6 +4,8 @@ set(AVCOMMON_SRC
   ${PROJECT_SOURCE_DIR}/src/common/AVConfig.h
   ${PROJECT_SOURCE_DIR}/src/common/AVConfig.cpp
   ${PROJECT_SOURCE_DIR}/src/common/AVError.h
+  ${PROJECT_SOURCE_DIR}/src/format/AVFormatBase.h
+  ${PROJECT_SOURCE_DIR}/src/format/AVFormatBase.cpp
   ${PROJECT_SOURCE_DIR}/src/common/base/AVDataSinkBase.h
   ${PROJECT_SOURCE_DIR}/src/common/base/AVDataSourceBase.h
 )
@@ -25,6 +27,7 @@ include_directories("${FFMPEG_DIR}/include")
 include_directories("${PROJECT_SOURCE_DIR}/src/common")
 include_directories("${PROJECT_SOURCE_DIR}/src/device")
 include_directories("${PROJECT_SOURCE_DIR}/src/codec")
+include_directories("${PROJECT_SOURCE_DIR}/src/format")
 include_directories("${PROJECT_SOURCE_DIR}/src/codec/base")
 
 link_directories("${FFMPEG_DIR}/lib")

@@ -26,36 +26,71 @@ VideoEncoder::~VideoEncoder() {
   uninit();
 }
 
-AV_RET VideoEncoder::setConfig(std::shared_ptr<MediaConfig> config) {
-  _mConfig = config;
-  H264Config* vConfig = static_cast<H264Config*>(_mConfig.get());
+AV_RET VideoEncoder::setConfig(std::shared_ptr<AVFormatBase> srcFmt, std::shared_ptr<AVFormatBase> dstFmt) {
+  _mFrame = av_frame_alloc();
+  if (NULL == _mFrame) {
+    LOGE("A Encoder", "Alloc AVFrame failed");
+    return AV_ALLOC_FRAME_ERR;
+  }
   
-  // Profile & level
-  _mCodecCtx->profile = vConfig->_mProfile;
-  _mCodecCtx->level = vConfig->_mLevel;
+  _mFormat = dstFmt;
+  
+  VideoFormatBase* dstVideoFmtBase = static_cast<VideoFormatBase*>(_mFormat.get());
+  
+  VideoFormatBase* srcVideoFmtBase = static_cast<VideoFormatBase*>(srcFmt.get());
+  if (VIDEO_YUV == srcVideoFmtBase->_mVideoFormat) {
+    LOGD("V Encoder", "Encode video, src format is yuv");
+    YUVFormat* yuvFmt = static_cast<YUVFormat*>(srcFmt.get());
+
+    // Source format
+    _mCodecCtx->pix_fmt = yuvFmt->_mPixelFormat;
+    _mFrame->format = yuvFmt->_mPixelFormat;
     
-  // Resolution
-  _mCodecCtx->width = vConfig->_mWidth;
-  _mCodecCtx->height = vConfig->_mHeight;
-
-  // Gop
-  //  _mCodecCtx->gop_size = vConfig->_mGopSize;
-  _mCodecCtx->gop_size = 250;
-  _mCodecCtx->keyint_min = 25;
-
-  _mCodecCtx->max_b_frames = 3; //option
-  _mCodecCtx->has_b_frames = 1; //option
-  _mCodecCtx->refs = 3;
-
-  // Source format
-  _mCodecCtx->pix_fmt = AV_PIX_FMT_YUV420P;
-
-  // Bitrate
-  _mCodecCtx->bit_rate = vConfig->_mBitRate;
+    _mOffsetSize.push_back(std::make_pair(0, yuvFmt->_mYSize));
+    _mOffsetSize.push_back(std::make_pair(yuvFmt->_mYSize, yuvFmt->_mUSize));
+    _mOffsetSize.push_back(std::make_pair(yuvFmt->_mYSize + yuvFmt->_mUSize, yuvFmt->_mVSize));
+  } else {
+    LOGE("V Encoder", "Encode video, unsupport source format");
+    return AV_FMT_UNSUPPORT;
+  }
   
-  // FrameRate
-  _mCodecCtx->time_base = (AVRational){1, vConfig->_mFrameRate};
-  _mCodecCtx->framerate = (AVRational){vConfig->_mFrameRate, 1};
+  if (VIDEO_H264 == dstVideoFmtBase->_mVideoFormat) {
+    LOGD("V Encoder", "Encode video, dest format is h264");
+    H264Format* h264Fmt = static_cast<H264Format*>(dstVideoFmtBase);
+    
+    // Set profile & level
+    _mCodecCtx->profile  = h264Fmt->_mProfile;
+    _mCodecCtx->level    = h264Fmt->_mLevel;
+    
+    // Resolution
+    _mCodecCtx->width    = h264Fmt->_mWidth;
+    _mCodecCtx->height   = h264Fmt->_mHeight;
+    
+    // Gop
+    _mCodecCtx->gop_size = h264Fmt->_mGopSize;
+    
+    // B Frame
+    if (h264Fmt->_mIsBFrame) {
+      _mCodecCtx->has_b_frames = 1;
+      _mCodecCtx->max_b_frames = h264Fmt->_mMaxBFrames;
+    }
+    
+    if (h264Fmt->_mRefs > 0)
+      _mCodecCtx->refs = h264Fmt->_mRefs;
+    
+    // Bitrate
+    _mCodecCtx->bit_rate = h264Fmt->_mBitRate;
+    // FrameRate
+    _mCodecCtx->time_base = (AVRational){1, h264Fmt->_mFrameRate};
+    _mCodecCtx->framerate = (AVRational){h264Fmt->_mFrameRate, 1};
+    
+  } else if (VIDEO_H265 == dstVideoFmtBase->_mVideoFormat) {
+    // Encode H265
+    LOGD("V Encoder", "Encoder video, dest format is h265");
+  } else {
+    LOGE("V Encoder", "Encode video, unsupport dest format");
+    return AV_FMT_UNSUPPORT;
+  }
 
   int ret = avcodec_open2(_mCodecCtx, _mCodec, NULL);
   if (ret < 0) {
@@ -63,16 +98,8 @@ AV_RET VideoEncoder::setConfig(std::shared_ptr<MediaConfig> config) {
     return AV_OPEN_CODEC_ERR;
   }
 
-  _mFrame = av_frame_alloc();
-  if (NULL == _mFrame) {
-    LOGE("A Encoder", "Alloc AVFrame failed");
-    return AV_ALLOC_FRAME_ERR;
-  }
-
-  //TODO: Modify this value later
-  _mFrame->format = AV_PIX_FMT_YUV420P;
-  _mFrame->width = vConfig->_mWidth;
-  _mFrame->height = vConfig->_mHeight;
+  _mFrame->width = dstVideoFmtBase->_mWidth;
+  _mFrame->height = dstVideoFmtBase->_mHeight;
   av_frame_get_buffer(_mFrame, 32);
   if (NULL == _mFrame || NULL == _mFrame->buf[0]) {
     LOGE("A Encoder", "Alloc AVFrame failed");
@@ -89,7 +116,14 @@ AV_RET VideoEncoder::setConfig(std::shared_ptr<MediaConfig> config) {
 }
 
 AV_RET VideoEncoder::encode(const uint8_t* data, size_t size) {
-  memcpy((void*)_mFrame->data[0], data, size);
+  for (int i = 0; i < _mOffsetSize.size(); i++) {
+    if (NULL != _mFrame->data[0])
+      memcpy((void*)_mFrame->data[i], data + _mOffsetSize[i].first, _mOffsetSize[i].second);
+    else {
+      LOGW("V Encoder", "Copy data failed, maybe not initialize");
+      return AV_FMT_UNINITIALIZE;
+    }
+  }
 
   int ret = 0;
   _mFrame->pts = _mPts++;

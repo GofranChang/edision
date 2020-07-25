@@ -19,14 +19,18 @@
 
 #include "base/AVDataSinkBase.h"
 #include "base/AVDataSourceBase.h"
-#include "AVConfig.h"
+#include "AVFormatBase.h"
 #include "AVError.h"
 
 namespace edision {
 
-enum MediaType {
-  AUDIO = 0,
-  VIDEO,
+enum CodecType {
+  AUDIO_ENCODER = 1000,
+  IMAGE_ENCODER,
+  VIDEO_ENCODER,
+  AUDIO_DECODER,
+  IMAGE_DECODER,
+  VIDEO_DECODER,
 };
 
 class EncoderBase : public AVDataSourceBase {
@@ -35,10 +39,10 @@ protected:
   virtual ~EncoderBase() = default;
 
 public:
-  static std::shared_ptr<EncoderBase> createNew(MediaType type, std::string& codecName);
+  static std::shared_ptr<EncoderBase> createNew(CodecType type, std::string& codecName);
 
   virtual AV_RET init();
-  virtual AV_RET setConfig(std::shared_ptr<MediaConfig> config) = 0;
+  virtual AV_RET setConfig(std::shared_ptr<AVFormatBase> srcFmt, std::shared_ptr<AVFormatBase> dstFmt) = 0;
   virtual void uninit();
 
   virtual AV_RET encode(const uint8_t* data, size_t size) = 0;
@@ -47,11 +51,10 @@ protected:
   MediaType _mType;
   std::string _mCodecName;
   
-  std::shared_ptr<MediaConfig> _mConfig;
+  std::shared_ptr<AVFormatBase> _mFormat;
 
   AVCodecContext* _mCodecCtx;
   AVCodec *_mCodec;
-//  MediaConfig _mConfig;
 
   AVFrame* _mFrame;
   AVPacket* _mPacket;

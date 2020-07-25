@@ -18,14 +18,15 @@
 
 namespace edision {
 
-std::shared_ptr<EncoderBase> EncoderBase::createNew(MediaType type, std::string& codecName) {
+std::shared_ptr<EncoderBase> EncoderBase::createNew(CodecType type, std::string& codecName) {
   std::shared_ptr<EncoderBase> res(nullptr);
 
   switch (type) {
-  case AUDIO:
-      res.reset(new AudioEncoder(codecName));
+  case AUDIO_ENCODER:
+      // TODO: Open this later
+//      res.reset(new AudioEncoder(codecName));
     break;
-  case VIDEO:
+  case VIDEO_ENCODER:
       res.reset(new VideoEncoder(codecName));
     break;
   default:
