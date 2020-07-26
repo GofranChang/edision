@@ -35,7 +35,6 @@ extern "C" {
 
 #include "base/AVDataSinkBase.h"
 #include "base/AVDataSourceBase.h"
-#include "AVConfig.h"
 #include "AVError.h"
 #include "EncoderBase.h"
 

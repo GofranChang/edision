@@ -27,12 +27,6 @@ VideoEncoder::~VideoEncoder() {
 }
 
 AV_RET VideoEncoder::setConfig(std::shared_ptr<AVFormatBase> srcFmt, std::shared_ptr<AVFormatBase> dstFmt) {
-  _mFrame = av_frame_alloc();
-  if (NULL == _mFrame) {
-    LOGE("A Encoder", "Alloc AVFrame failed");
-    return AV_ALLOC_FRAME_ERR;
-  }
-  
   _mFormat = dstFmt;
   
   VideoFormatBase* dstVideoFmtBase = static_cast<VideoFormatBase*>(_mFormat.get());
@@ -106,12 +100,6 @@ AV_RET VideoEncoder::setConfig(std::shared_ptr<AVFormatBase> srcFmt, std::shared
     return AV_ALLOC_FRAME_ERR;
   }
 
-  _mPacket = av_packet_alloc();
-  if (NULL == _mPacket) {
-    LOGE("A Encoder", "Alloc AVPacket failed");
-    return AV_ALLOC_PACKET_ERR;
-  }
-
   return AV_SUCCESS;
 }
 
@@ -121,7 +109,7 @@ AV_RET VideoEncoder::encode(const uint8_t* data, size_t size) {
       memcpy((void*)_mFrame->data[i], data + _mOffsetSize[i].first, _mOffsetSize[i].second);
     else {
       LOGW("V Encoder", "Copy data failed, maybe not initialize");
-      return AV_FMT_UNINITIALIZE;
+      return AV_UNINITIALIZE;
     }
   }
 

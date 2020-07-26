@@ -33,26 +33,22 @@ extern "C" {
 
 #include "base/AVDataSinkBase.h"
 #include "base/AVDataSourceBase.h"
-#include "AVConfig.h"
 #include "AVError.h"
 #include "EncoderBase.h"
 
 namespace edision {
 
-#if 0
 // TODO: Modify this later
-class AudioEncoder {
+class AudioEncoder : public EncoderBase {
 public:
   AudioEncoder(std::string& codecName);
   ~AudioEncoder();
 
 public:
-  AV_RET setConfig(std::shared_ptr<MediaConfig> config);
+  AV_RET setConfig(std::shared_ptr<AVFormatBase> srcFmt, std::shared_ptr<AVFormatBase> dstFmt) override;
   
-  AV_RET encode(const uint8_t* data, size_t size);
+  AV_RET encode(const uint8_t* data, size_t size) override;
 };
-
-#endif
 
 }
 

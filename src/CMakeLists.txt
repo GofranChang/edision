@@ -1,8 +1,8 @@
 set(AVCOMMON_SRC
   ${PROJECT_SOURCE_DIR}/src/common/AVGuard.h
   ${PROJECT_SOURCE_DIR}/src/common/AVGuard.cpp
-  ${PROJECT_SOURCE_DIR}/src/common/AVConfig.h
-  ${PROJECT_SOURCE_DIR}/src/common/AVConfig.cpp
+  ${PROJECT_SOURCE_DIR}/src/device/base/DeviceBase.h
+  ${PROJECT_SOURCE_DIR}/src/device/base/DeviceBase.cpp
   ${PROJECT_SOURCE_DIR}/src/common/AVError.h
   ${PROJECT_SOURCE_DIR}/src/format/AVFormatBase.h
   ${PROJECT_SOURCE_DIR}/src/format/AVFormatBase.cpp
@@ -29,6 +29,7 @@ include_directories("${PROJECT_SOURCE_DIR}/src/device")
 include_directories("${PROJECT_SOURCE_DIR}/src/codec")
 include_directories("${PROJECT_SOURCE_DIR}/src/format")
 include_directories("${PROJECT_SOURCE_DIR}/src/codec/base")
+include_directories("${PROJECT_SOURCE_DIR}/src/device/base")
 
 link_directories("${FFMPEG_DIR}/lib")
 

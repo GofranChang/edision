@@ -14,6 +14,7 @@
 #ifndef __EDISION_CODEC_ENCODERBASE_H__
 #define __EDISION_CODEC_ENCODERBASE_H__
 
+#include <memory>
 #include <string>
 #include <thread>
 

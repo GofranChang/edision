@@ -58,6 +58,18 @@ AV_RET EncoderBase::init() {
     LOGE("A Encoder", "Alloc codec context failed");
     return AV_ALLOC_CODEC_CTX_ERR;
   }
+  
+  _mFrame = av_frame_alloc();
+  if (NULL == _mFrame) {
+    LOGE("A Encoder", "Alloc AVFrame failed");
+    return AV_ALLOC_FRAME_ERR;
+  }
+  
+  _mPacket = av_packet_alloc();
+  if (NULL == _mPacket) {
+    LOGE("A Encoder", "Alloc AVPacket failed");
+    return AV_ALLOC_PACKET_ERR;
+  }
 
   return AV_SUCCESS;
 }

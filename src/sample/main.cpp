@@ -16,13 +16,10 @@
 #include "MyLogger.h"
 #include "AudioEncoder.h"
 
-#if 1
 using namespace edision;
-
-static FILE* gFout = nullptr;
-
 //////////////////////////////////////////////////////
 // Audio Sink
+/*
 class MyRecDataSink : public AVDataSinkBase {
 public:
   virtual void onData(uint8_t* data, size_t size) override;
@@ -40,7 +37,10 @@ void MyRecDataSink::onData(uint8_t *data, size_t size) {
 //  if (gFout)
 //    fwrite(data, 1, size, gFout);
 }
+*/
 
+#if 0
+/*
 class MyResampleDataSink : public AVDataSinkBase {
 public:
   virtual void onData(uint8_t* data, size_t size) override;
@@ -126,114 +126,58 @@ void MyEncodedDataSink::onData(uint8_t* data, size_t size) {
   if (gFout)
     fwrite(data, 1, size, gFout);
 }
+ */
+#endif
+
+class MyFileWriterSink : public AVDataSinkBase {
+public:
+  MyFileWriterSink(std::string fileName);
+  ~MyFileWriterSink();
+  
+  virtual void onData(uint8_t* data, size_t size) override;
+  
+private:
+  FILE* _mOutputFile;
+};
+
+MyFileWriterSink::MyFileWriterSink(std::string fileName) {
+  _mOutputFile = fopen(fileName.c_str(), "wb+");
+}
+
+MyFileWriterSink::~MyFileWriterSink() {
+  if (nullptr != _mOutputFile)
+    fclose(_mOutputFile);
+}
+
+void MyFileWriterSink::onData(uint8_t* data, size_t size) {
+  if (nullptr != _mOutputFile) {
+    LOGD("Demo", "Receive data, size ({})", size);
+    fwrite(data, 1, size, _mOutputFile);
+  }
+}
+
 
 int main(int argc, const char* argv[]) {
   auto logger = my_media::KooLogger::Instance();
   logger->initLogger(spdlog::level::debug, true, "", false);
   
-  // Audio Encoder test
-#if 0
-  AudioRecorder recorder;
-  std::string devName = ":0";
-  std::string inpName = "avfoundation";
-  recorder.init(devName, inpName);
+  /**
+   * Recoder Audio test
+   */
+  std::shared_ptr<InputDeviceBase> audioRecorder(InputDeviceBase::createNew(DEVICE_MICROPHONE));
+  audioRecorder->init(":0", "avfoundation");
   
-  std::shared_ptr<MyRecDataSink> recDataSink(new MyRecDataSink);
-  recorder.setDataSink(recDataSink);
+  std::shared_ptr<MyFileWriterSink> fileSink(new MyFileWriterSink("/Users/gofran/Documents/workspace/gitproj/edision/resource/out.pcm"));
+  audioRecorder->setDataSink(fileSink);
   
-  std::shared_ptr<AudioResampler> resampler(new AudioResampler);
-  AudioConfig inCfg;
-  AudioConfig outCfg;
+  for (int i = 0; i < 500; i++)
+    audioRecorder->readData();
 
-  inCfg._mChannelLayout = AV_CH_LAYOUT_MONO;
-  inCfg._mChannelNums = 1;
-  inCfg._mSampleFmt = AV_SAMPLE_FMT_FLT;
-  inCfg._mSampleRate = 48000;
-
-  outCfg._mChannelLayout = AV_CH_LAYOUT_STEREO;
-  outCfg._mChannelNums = 2;
-  outCfg._mSampleFmt = AV_SAMPLE_FMT_S16;
-  outCfg._mSampleRate = 48000;
-  
-  std::shared_ptr<AudioConfig> AEncoderCfg(new AudioConfig);
-  AEncoderCfg->_mChannelLayout = AV_CH_LAYOUT_STEREO;
-  AEncoderCfg->_mChannelNums = 2;
-  AEncoderCfg->_mSampleFmt = AV_SAMPLE_FMT_S16;
-  AEncoderCfg->_mSampleRate = 48000;
-
-  
-  resampler->init(inCfg, outCfg, 512);
-  recDataSink->setResampler(resampler);
-  
-  std::shared_ptr<MyResampleDataSink> resampleSink(new MyResampleDataSink);
-  resampler->setDataSink(resampleSink);
-
-  std::string encoderName = "libfdk_aac";
-  std::shared_ptr<EncoderBase> encoder(EncoderBase::createNew(AUDIO, encoderName));
-  encoder->init();
-//  std::shared_ptr<AudioConfig> AEncoderCfg(&outCfg);
-  encoder->setConfig(AEncoderCfg);
-  
-  resampleSink->setEncoder(encoder);
-  
-  std::shared_ptr<MyEncodedDataSink> encoderSink(new MyEncodedDataSink);
-  encoder->setDataSink(encoderSink);
-  
-  gFout = fopen("/Users/gofran/Documents/workspace/gitproj/edision/resource/newout.aac", "wb+");
-  for (int i = 0; i < 500; i++) {
-//  while (1) {
-    recorder.record();
-  }
-  
-  fflush(gFout);
-  fclose(gFout);
-#endif
-
-#if 0
-  // Video Recoder test
-  VideoRecorder vRec;
-  std::string devName = "0";
-  std::string inpName = "avfoundation";
-  VideoConfig vCfg;
-  vCfg._mFmt = AV_PIX_FMT_NV12;
-  vCfg._mWidth = 640;
-  vCfg._mHeight = 480;
-  vCfg._mFrameRate = 30;
-  vRec.init(devName, inpName, vCfg);
-
-  std::shared_ptr<MyCaptureDataSink> capDataSink(new MyCaptureDataSink);
-  std::shared_ptr<MyEncodedDataSink> recDataSink(new MyEncodedDataSink);
-  
-  std::shared_ptr<H264Config> VEncoderCfg(new H264Config);
-  VEncoderCfg->_mFmt = AV_PIX_FMT_YUV420P;
-  VEncoderCfg->_mWidth = 640;
-  VEncoderCfg->_mHeight = 480;
-  VEncoderCfg->_mFrameRate = 30;
-  VEncoderCfg->_mProfile = FF_PROFILE_H264_HIGH;
-  VEncoderCfg->_mLevel = 50;
-  VEncoderCfg->_mGopSize = 25;
-  VEncoderCfg->_mBitRate = 1000 * 1024;
-  
-  std::string encoderName = "libx264";
-  std::shared_ptr<EncoderBase> encoder(EncoderBase::createNew(VIDEO, encoderName));
-  encoder->init();
-  //  std::shared_ptr<AudioConfig> AEncoderCfg(&outCfg);
-  encoder->setConfig(VEncoderCfg);
-  encoder->setDataSink(recDataSink);
-  
-  capDataSink->setEncoder(encoder);
-//  vRec.setDataSink(recDataSink);
-  vRec.setDataSink(capDataSink);
-
-  gFout = fopen("/Users/gofran/Documents/workspace/gitproj/edision/resource/newout.h264", "wb+");
-  for (int i = 0; i < 500; i++) {
-//  while (1) {
-    vRec.record();
-  }
-#endif
-  
-  
-  /* Initialize encoder */
+#ifdef ENCODE_H264_TEST
+  /**
+   * Encoder yuv to h264 test
+   */
+  ////////////////////////////////////////////////////////
   std::string encoderName = "libx264";
   std::shared_ptr<EncoderBase> encoder(EncoderBase::createNew(VIDEO_ENCODER, encoderName));
   encoder->init();
@@ -248,7 +192,7 @@ int main(int argc, const char* argv[]) {
   
   encoder->setConfig(inputFmt, outputFmt);
   
-  std::shared_ptr<MyEncodedDataSink> recDataSink(new MyEncodedDataSink);
+  std::shared_ptr<MyFileWriterSink> recDataSink(new MyFileWriterSink("/Users/gofran/Documents/workspace/gitproj/edision/build/newout.h264"));
   encoder->setDataSink(recDataSink);
   
   FILE* inputYuv = fopen("/Users/gofran/Documents/workspace/gitproj/edision/build/ConferenceMotion_1280_720_50.yuv", "rb+");
@@ -256,8 +200,6 @@ int main(int argc, const char* argv[]) {
     LOGE("Main", "Open input yuv failed, {}", strerror(errno));
     return -1;
   }
-  
-  gFout = fopen("/Users/gofran/Documents/workspace/gitproj/edision/build/newout.h264", "wb+");
 
   int ret = 0;
   uint8_t readBuf[1382400];
@@ -267,68 +209,10 @@ int main(int argc, const char* argv[]) {
     
     encoder->encode(readBuf, 1280 * 720 * 3 / 2);
   }
-  /*
-  std::shared_ptr<H264Config> VEncoderCfg(new H264Config);
-  VEncoderCfg->_mFmt = AV_PIX_FMT_YUV420P;
-  VEncoderCfg->_mWidth = 640;
-  VEncoderCfg->_mHeight = 480;
-  VEncoderCfg->_mFrameRate = 30;
-  VEncoderCfg->_mProfile = FF_PROFILE_H264_HIGH_444;
-  VEncoderCfg->_mLevel = 50;
-  VEncoderCfg->_mGopSize = 25;
-  VEncoderCfg->_mBitRate = 1000 * 1024;
-  
-  std::shared_ptr<MyEncodedDataSink> recDataSink(new MyEncodedDataSink);
-  
-//  encoder->setConfig(VEncoderCfg);
-  encoder->setDataSink(recDataSink);
-  
-  FILE* inputYuv = fopen("/Users/gofran/Documents/workspace/gitproj/edision/build/video.yuv", "rb+");
-  if (nullptr == inputYuv) {
-    LOGE("Main", "Open input yuv failed, {}", strerror(errno));
-    return -1;
-  }
-  
-  gFout = fopen("/Users/gofran/Documents/workspace/gitproj/edision/build/newout.h264", "wb+");
-  
-  int ret = 0;
-  uint8_t readBuf[1382400];
-  memset(readBuf, 0, 640 * 480 * 3 / 2);
-  while (!feof(inputYuv)) {
-    ret = fread(readBuf, 1, 640 * 480 * 3 / 2, inputYuv);
-    
-    encoder->encode(readBuf, 640 * 480 * 3 / 2);
-  }
-   */
   
   fclose(inputYuv);
-  fclose(gFout);
+  ////////////////////////////////////////////////////////
+#endif // ENCODE_H264_TEST
   
   return 0;
 }
-#endif
-
-/*
-class Base {
-public:
-  Base(std::string str) {
-    std::cout << "Base construct : " << str << std::endl;
-  }
-};
-
-class Derive : public Base {
-public:
-  Derive(std::string str) : Base(str) {
-    std::cout << "Derive construct : " << str << std::endl;
-  }
-};
-
-int main(int argc, const char* argv[]) {
-//  Derive d("Test1");
-  
-  Base* b = new Base("Test2");
-  Derive* d2 = static_cast<Derive*>(b);
-  
-  return 0;
-}
- */

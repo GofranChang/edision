@@ -34,30 +34,22 @@ extern "C" {
 #endif
 
 #include "AVGuard.h"
-#include "AVConfig.h"
 #include "AVError.h"
 #include "base/AVDataSinkBase.h"
 #include "base/AVDataSourceBase.h"
+#include "DeviceBase.h"
 
 namespace edision {
 
-class AudioRecorder : public AVDataSourceBase {
+class AudioRecorder : public InputDeviceBase {
 public:
   AudioRecorder();
-  ~AudioRecorder();
+  ~AudioRecorder() = default;
   
-  AV_RET init(std::string& devName, std::string& inpName);
-
-  void uninit();
-  
-  AV_RET record();
-  
-private:
-  AVPacket* _mAVPkt;
-
-  AVFormatContext* _mFmtCtx;
+  virtual AV_RET readData() override;
 };
 
+#if 0
 class AudioResampler : public AVDataSourceBase {
 public:
   AudioResampler();
@@ -85,6 +77,7 @@ private:
   AudioConfig _mSrcCfg;
   AudioConfig _mSinkCfg;
 };
+#endif
 
 } // namespace edision
 

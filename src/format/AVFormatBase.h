@@ -46,6 +46,18 @@ struct AVFormatBase {
 };
 
 /** 
+ * AudioFormatBase
+ */
+struct AudioFormatBase : public AVFormatBase {
+  AVSampleFormat _mSampleFmt;
+  int            _mSampleRate;
+  uint64_t       _mChannelLayout;
+  int            _mProfile;
+  
+  AudioFormatBase() : AVFormatBase(AudioType) {}
+};
+
+/** 
  * VideoFormatBase
  */
 struct VideoFormatBase : public AVFormatBase {

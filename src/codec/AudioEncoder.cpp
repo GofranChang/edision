@@ -18,7 +18,6 @@
 
 namespace edision {
 
-#if 0
 AudioEncoder::AudioEncoder(std::string& codecName) : EncoderBase(codecName) {
 }
 
@@ -26,14 +25,14 @@ AudioEncoder::~AudioEncoder() {
   uninit();
 }
 
-AV_RET AudioEncoder::setConfig(std::shared_ptr<MediaConfig> config) {
-  _mConfig = config;
-  AudioConfig* aConfig = static_cast<AudioConfig*>(_mConfig.get());
+AV_RET AudioEncoder::setConfig(std::shared_ptr<AVFormatBase> srcFmt, std::shared_ptr<AVFormatBase> dstFmt) {
+  _mFormat = dstFmt;
+  AudioFormatBase* dstAudioFmtBase = static_cast<AudioFormatBase*>(_mFormat.get());
 
-  _mCodecCtx->sample_fmt = aConfig->_mSampleFmt;
-  _mCodecCtx->sample_rate = aConfig->_mSampleRate;
-  _mCodecCtx->channel_layout = aConfig->_mChannelLayout;
-  _mCodecCtx->profile = FF_PROFILE_AAC_HE_V2;
+  _mCodecCtx->sample_fmt = dstAudioFmtBase->_mSampleFmt;
+  _mCodecCtx->sample_rate = dstAudioFmtBase->_mSampleRate;
+  _mCodecCtx->channel_layout = dstAudioFmtBase->_mChannelLayout;
+  _mCodecCtx->profile = dstAudioFmtBase->_mProfile;
 
   int ret = avcodec_open2(_mCodecCtx, _mCodec, NULL);
   if (ret < 0) {
@@ -49,8 +48,8 @@ AV_RET AudioEncoder::setConfig(std::shared_ptr<MediaConfig> config) {
 
   //TODO: Modify this value later
   _mFrame->nb_samples = 512;
-  _mFrame->format = aConfig->_mSampleFmt;
-  _mFrame->channel_layout = aConfig->_mChannelLayout;
+  _mFrame->format = dstAudioFmtBase->_mSampleFmt;
+  _mFrame->channel_layout = dstAudioFmtBase->_mChannelLayout;
   av_frame_get_buffer(_mFrame, 0);
   if (NULL == _mFrame || NULL == _mFrame->buf[0]) {
     LOGE("A Encoder", "Alloc AVFrame failed");
@@ -89,6 +88,5 @@ AV_RET AudioEncoder::encode(const uint8_t* data, size_t size) {
 
   return AV_SUCCESS;
 }
-#endif
 
 } // namespace edision

@@ -34,34 +34,26 @@ extern "C" {
 #endif
 
 #include "AVGuard.h"
-#include "AVConfig.h"
 #include "AVError.h"
-#include "base/AVDataSinkBase.h"
-#include "base/AVDataSourceBase.h"
+#include "DeviceBase.h"
 
 namespace edision {
 
-class VideoRecorder : public AVDataSourceBase {
+class VideoRecorder : public InputDeviceBase {
 public:
   VideoRecorder();
   ~VideoRecorder();
 
-  AV_RET init(std::string& devName, std::string& inpName, VideoConfig& cfg);
+  // virtual AV_RET init(std::string inputName, std::string formatName) override;
 
-  void uninit();
+  virtual AV_RET readData() override;
 
-  AV_RET record();
+  virtual AV_RET setFormat(std::shared_ptr<AVFormatBase> fmt) override;
 
 private:
-  AVPacket* _mAVPkt;
-
-  AVFormatContext* _mFmtCtx;
-
   AVDictionary* _mVideoOptionals;
 
-  VideoConfig _mVideoCfg;
-
-  int _mFrameSize;
+  int           _mFrameSize;
 };
 
 } // namespace edision
