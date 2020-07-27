@@ -161,6 +161,7 @@ int main(int argc, const char* argv[]) {
   auto logger = my_media::KooLogger::Instance();
   logger->initLogger(spdlog::level::debug, true, "", false);
   
+#ifdef ENCODE_H264_TEST
   /**
    * Recoder Audio test
    */
@@ -172,6 +173,27 @@ int main(int argc, const char* argv[]) {
   
   for (int i = 0; i < 500; i++)
     audioRecorder->readData();
+#endif
+  
+  /**
+   * Recoder Video test
+   */
+  std::shared_ptr<InputDeviceBase> videoRecorder(InputDeviceBase::createNew(DEVICE_CAMERA));
+
+  std::shared_ptr<MyFileWriterSink> fileSink(new MyFileWriterSink("/Users/gofran/Documents/workspace/gitproj/edision/resource/out.yuv"));
+  videoRecorder->setDataSink(fileSink);
+  
+  std::shared_ptr<YUVFormat> recordYuvForat(new YUVFormat(AV_PIX_FMT_NV12, 1280, 720));
+//  recordYuvForat->_mPixelFormat = AV_PIX_FMT_NV12;
+//  recordYuvForat->_mWidth = 1280;
+//  recordYuvForat->_mHeight = 720;
+  recordYuvForat->_mFrameRate = 30;
+  videoRecorder->setFormat(recordYuvForat);
+  
+  videoRecorder->init("0", "avfoundation");
+  
+  for (int i = 0; i < 500; i++)
+    videoRecorder->readData();
 
 #ifdef ENCODE_H264_TEST
   /**

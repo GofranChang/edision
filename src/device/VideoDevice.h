@@ -44,7 +44,9 @@ public:
   VideoRecorder();
   ~VideoRecorder();
 
-  // virtual AV_RET init(std::string inputName, std::string formatName) override;
+  virtual AV_RET init(std::string inputName, std::string formatName) override;
+//  
+  virtual void uninit() override;
 
   virtual AV_RET readData() override;
 

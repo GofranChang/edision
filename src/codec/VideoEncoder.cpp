@@ -37,8 +37,8 @@ AV_RET VideoEncoder::setConfig(std::shared_ptr<AVFormatBase> srcFmt, std::shared
     YUVFormat* yuvFmt = static_cast<YUVFormat*>(srcFmt.get());
 
     // Source format
-    _mCodecCtx->pix_fmt = yuvFmt->_mPixelFormat;
-    _mFrame->format = yuvFmt->_mPixelFormat;
+    _mCodecCtx->pix_fmt = yuvFmt->_mYUVPixelFormat;
+    _mFrame->format = yuvFmt->_mYUVPixelFormat;
     
     _mOffsetSize.push_back(std::make_pair(0, yuvFmt->_mYSize));
     _mOffsetSize.push_back(std::make_pair(yuvFmt->_mYSize, yuvFmt->_mUSize));

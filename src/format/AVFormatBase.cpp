@@ -21,6 +21,7 @@ VideoFormatBase::VideoFormatBase(VideoFormatType type, \
 YUVFormat::YUVFormat(AVPixelFormat formatType, \
                       int width, \
                       int height) : VideoFormatBase(VIDEO_YUV, width, height) {
+  _mYUVPixelFormat = formatType;
   switch (formatType) {
   case AV_PIX_FMT_NV12 :
   case AV_PIX_FMT_NV21 :

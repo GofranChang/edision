@@ -24,7 +24,7 @@ namespace edision {
 *                eg. In macos is "avfoundation"
 *
 */
-VideoRecorder::VideoRecorder() {
+VideoRecorder::VideoRecorder() : _mVideoOptionals(nullptr) {
 }
 
 /**
@@ -37,6 +37,44 @@ VideoRecorder::VideoRecorder() {
 *
 */
 VideoRecorder::~VideoRecorder() {
+}
+
+AV_RET VideoRecorder::init(std::string inputName, std::string formatName) {
+  if (nullptr == _mVideoOptionals) {
+    LOGE("V Recorder", "video optional is null, maybe not set record parameter");
+    return AV_UNINITIALIZE;
+  }
+  
+  avdevice_register_all();
+  int ret = avformat_open_input(&_mInputFmtCtx, inputName.c_str(), av_find_input_format(formatName.c_str()), &_mVideoOptionals);
+  if (ret < 0) {
+    char errors[1024];
+    av_strerror(ret, errors, 1024);
+    LOGE("A Recorder", "Open microphone error, error message \"{}\"", errors);
+    return AV_OPEN_INPUT_ERR;
+  }
+  
+  LOGI("A Recorder", "Open microphone {} success", inputName);
+
+  _mOutputPkt = av_packet_alloc();
+  if (NULL == _mOutputPkt) {
+    LOGE("A Recorder", "Alloc AVPacket error");
+    return AV_ALLOC_PACKET_ERR;
+  }
+}
+
+void VideoRecorder::uninit() {
+  if (NULL != _mInputFmtCtx) {
+    avformat_close_input(&_mInputFmtCtx);
+  }
+  
+  if (NULL != _mOutputPkt) {
+    av_packet_free(&_mOutputPkt);
+  }
+  
+  if (NULL != _mVideoOptionals) {
+    av_dict_free(&_mVideoOptionals);
+  }
 }
 
 /**
@@ -75,9 +113,9 @@ AV_RET VideoRecorder::setFormat(std::shared_ptr<AVFormatBase> fmt) {
 
   if (VIDEO_YUV == videoFmtBase->_mVideoFormat) {
     YUVFormat* yuvFmt = static_cast<YUVFormat*>(videoFmtBase);
-    av_dict_set(&_mVideoOptionals, "pixel_format", YUVFormat::_mFmtUpon[yuvFmt->_mPixelFormat].c_str(), 0);
+    av_dict_set(&_mVideoOptionals, "pixel_format", YUVFormat::_mFmtUpon[yuvFmt->_mYUVPixelFormat].c_str(), 0);
 
-    switch (yuvFmt->_mPixelFormat) {
+    switch (yuvFmt->_mYUVPixelFormat) {
     case AV_PIX_FMT_YUV444P:
       _mFrameSize = videoFmtBase->_mWidth * videoFmtBase->_mHeight * 3;
       break;

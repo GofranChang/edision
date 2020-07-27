@@ -76,7 +76,7 @@ struct VideoFormatBase : public AVFormatBase {
 struct YUVFormat : public VideoFormatBase {
   YUVFormat(AVPixelFormat formatType, int wigth, int height);
 
-  AVPixelFormat _mPixelFormat;
+  AVPixelFormat _mYUVPixelFormat;
   int           _mFrameSize;
 
   // Y U V start location and size
