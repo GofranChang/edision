@@ -11,16 +11,16 @@
  * This file is part of Edision.
  */
 
-#ifndef __EDISION_CODEC_ENCODERBASE_H__
-#define __EDISION_CODEC_ENCODERBASE_H__
+#ifndef __EDISION_CODEC_IENCODER_H__
+#define __EDISION_CODEC_IENCODER_H__
 
 #include <memory>
 #include <string>
 #include <thread>
 
-#include "base/AVDataSinkBase.h"
-#include "base/AVDataSourceBase.h"
-#include "AVFormatBase.h"
+#include "base/IAVDataSink.h"
+#include "base/IAVDataSource.h"
+#include "IAVFormat.h"
 #include "AVError.h"
 
 namespace edision {
@@ -34,16 +34,16 @@ enum CodecType {
   VIDEO_DECODER,
 };
 
-class EncoderBase : public AVDataSourceBase {
+class IEncoder : public IAVDataSource {
 protected:
-  EncoderBase(std::string& codecName);
-  virtual ~EncoderBase() = default;
+  IEncoder(std::string& codecName);
+  virtual ~IEncoder() = default;
 
 public:
-  static std::shared_ptr<EncoderBase> createNew(CodecType type, std::string& codecName);
+  static std::shared_ptr<IEncoder> createNew(CodecType type, std::string& codecName);
 
   virtual AV_RET init();
-  virtual AV_RET setConfig(std::shared_ptr<AVFormatBase> srcFmt, std::shared_ptr<AVFormatBase> dstFmt) = 0;
+  virtual AV_RET setConfig(std::shared_ptr<IAVFormat> srcFmt, std::shared_ptr<IAVFormat> dstFmt) = 0;
   virtual void uninit();
 
   virtual AV_RET encode(const uint8_t* data, size_t size) = 0;
@@ -52,7 +52,7 @@ protected:
   MediaType _mType;
   std::string _mCodecName;
   
-  std::shared_ptr<AVFormatBase> _mFormat;
+  std::shared_ptr<IAVFormat> _mFormat;
 
   AVCodecContext* _mCodecCtx;
   AVCodec *_mCodec;
@@ -63,4 +63,4 @@ protected:
 
 }
 
-#endif //__EDISION_CODEC_ENCODERBASE_H__
+#endif //__EDISION_CODEC_IENCODER_H__

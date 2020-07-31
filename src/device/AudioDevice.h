@@ -35,13 +35,13 @@ extern "C" {
 
 #include "AVGuard.h"
 #include "AVError.h"
-#include "base/AVDataSinkBase.h"
-#include "base/AVDataSourceBase.h"
-#include "DeviceBase.h"
+#include "base/IAVDataSink.h"
+#include "base/IAVDataSource.h"
+#include "IDevice.h"
 
 namespace edision {
 
-class AudioRecorder : public InputDeviceBase {
+class AudioRecorder : public IInputDevice {
 public:
   AudioRecorder();
   ~AudioRecorder() = default;

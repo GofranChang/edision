@@ -1,2 +1,5 @@
 .DS_Store
 /resource/
+/deps/iOS/
+/build/
+/build_ios/

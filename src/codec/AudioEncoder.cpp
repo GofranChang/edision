@@ -18,14 +18,14 @@
 
 namespace edision {
 
-AudioEncoder::AudioEncoder(std::string& codecName) : EncoderBase(codecName) {
+AudioEncoder::AudioEncoder(std::string& codecName) : IEncoder(codecName) {
 }
 
 AudioEncoder::~AudioEncoder() {
   uninit();
 }
 
-AV_RET AudioEncoder::setConfig(std::shared_ptr<AVFormatBase> srcFmt, std::shared_ptr<AVFormatBase> dstFmt) {
+AV_RET AudioEncoder::setConfig(std::shared_ptr<IAVFormat> srcFmt, std::shared_ptr<IAVFormat> dstFmt) {
   _mFormat = dstFmt;
   AudioFormatBase* dstAudioFmtBase = static_cast<AudioFormatBase*>(_mFormat.get());
 

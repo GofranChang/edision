@@ -3,9 +3,9 @@
 
 #include <memory>
 
-#include "base/AVDataSinkBase.h"
-#include "base/AVDataSourceBase.h"
-#include "AVFormatBase.h"
+#include "base/IAVDataSink.h"
+#include "base/IAVDataSource.h"
+#include "IAVFormat.h"
 #include "AVError.h"
 
 namespace edision {
@@ -15,17 +15,17 @@ enum DeviceType {
   DEVICE_CAMERA,
 };
 
-class InputDeviceBase : public AVDataSourceBase {
+class IInputDevice : public IAVDataSource {
 protected:
-  InputDeviceBase();
-  virtual ~InputDeviceBase();
+  IInputDevice();
+  virtual ~IInputDevice();
 
 public:
-  static std::shared_ptr<InputDeviceBase> createNew(DeviceType type);
+  static std::shared_ptr<IInputDevice> createNew(DeviceType type);
 
   virtual AV_RET init(std::string inputName, std::string formatName);
 
-  virtual AV_RET setFormat(std::shared_ptr<AVFormatBase> fmt);
+  virtual AV_RET setFormat(std::shared_ptr<IAVFormat> fmt);
 
   virtual void uninit();
 
@@ -34,7 +34,7 @@ public:
 protected:
   AVPacket*                     _mOutputPkt;
   AVFormatContext*              _mInputFmtCtx;
-  std::shared_ptr<AVFormatBase> _mFmtBase;
+  std::shared_ptr<IAVFormat>    _mFmtBase;
 };
 
 } // namespace edision 

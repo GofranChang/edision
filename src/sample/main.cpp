@@ -17,119 +17,9 @@
 #include "AudioEncoder.h"
 
 using namespace edision;
-//////////////////////////////////////////////////////
-// Audio Sink
-/*
-class MyRecDataSink : public AVDataSinkBase {
-public:
-  virtual void onData(uint8_t* data, size_t size) override;
-  inline void setResampler(std::shared_ptr<AudioResampler> rsp) {
-    _mResampler = rsp;
-  }
-  
-private:
-  std::shared_ptr<AudioResampler> _mResampler;
-};
-
-void MyRecDataSink::onData(uint8_t *data, size_t size) {
-  _mResampler->resample(data, size);
-//  LOGD("Main", "onData, size ({})", size);
-//  if (gFout)
-//    fwrite(data, 1, size, gFout);
-}
-*/
-
-#if 0
-/*
-class MyResampleDataSink : public AVDataSinkBase {
-public:
-  virtual void onData(uint8_t* data, size_t size) override;
-  inline void setEncoder(std::shared_ptr<EncoderBase> ecdr) {
-    _mEncoder = ecdr;
-  }
-
-private:
-  std::shared_ptr<EncoderBase> _mEncoder;
-};
-
-void MyResampleDataSink::onData(uint8_t *data, size_t size) {
-  // LOGD("Main", "onData, size ({})", size);
-  // if (gFout)
-  //   fwrite(data, 1, size, gFout);
-  _mEncoder->encode(data, size);
-}
-
 
 //////////////////////////////////////////////////////
-// Video Sink
-class MyCaptureDataSink : public AVDataSinkBase {
-public:
-  virtual void onData(uint8_t* data, size_t size) override;
-  inline void setEncoder(std::shared_ptr<EncoderBase> ecdr) {
-    _mEncoder = ecdr;
-  }
-
-private:
-  std::shared_ptr<EncoderBase> _mEncoder;
-};
-  
-void MyCaptureDataSink::onData(uint8_t *data, size_t size) {
-  uint8_t* revert = new uint8_t[size];
-  
-#if 0
-  memcpy(revert, data, 307200); //copy Y data
-  //307200之后，是UV
-  for(int i=0; i < 307200/4; i++){
-//      frame->data[1][i] = pkt.data[307200+i*2];
-//      frame->data[2][i] = pkt.data[307201+i*2];
-    revert[307200 + i] = data[307200+i*2];
-    revert[307201 + i] = data[307201+i*2];
-  }
-#endif
-  
-  
-  memcpy(revert, data, 307200);
-
-
-  //u
-  int i =0;
-  for (int j =0; j < 307200 /2; j +=2) {
-    revert[307200 + i] = data[307200 + j];
-    i++;
-  }
-
-  //v
-  i =0;
-  for (int j =1; j < 307200 /2; j+=2) {
-    revert[307200 *5 /4 + i] = data[307200 + j];
-    i++;
-  }
-  
-  
-  
-  
-  
-  
-  if (_mEncoder.get())
-    _mEncoder->encode(revert, size);
-  
-  delete[] revert;
-}
-
-class MyEncodedDataSink : public AVDataSinkBase {
-public:
-  virtual void onData(uint8_t* data, size_t size) override;
-};
-
-void MyEncodedDataSink::onData(uint8_t* data, size_t size) {
-  LOGD("Main", "onData, size ({})", size);
-  if (gFout)
-    fwrite(data, 1, size, gFout);
-}
- */
-#endif
-
-class MyFileWriterSink : public AVDataSinkBase {
+class MyFileWriterSink : public IAVDataSink {
 public:
   MyFileWriterSink(std::string fileName);
   ~MyFileWriterSink();
@@ -178,7 +68,7 @@ int main(int argc, const char* argv[]) {
   /**
    * Recoder Video test
    */
-  std::shared_ptr<InputDeviceBase> videoRecorder(InputDeviceBase::createNew(DEVICE_CAMERA));
+  std::shared_ptr<IInputDevice> videoRecorder(IInputDevice::createNew(DEVICE_CAMERA));
 
   std::shared_ptr<MyFileWriterSink> fileSink(new MyFileWriterSink("/Users/gofran/Documents/workspace/gitproj/edision/resource/out.yuv"));
   videoRecorder->setDataSink(fileSink);

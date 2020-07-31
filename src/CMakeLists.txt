@@ -5,13 +5,13 @@ set(RESOURCE_FILES
 set(AVCOMMON_SRC
   ${PROJECT_SOURCE_DIR}/src/common/AVGuard.h
   ${PROJECT_SOURCE_DIR}/src/common/AVGuard.cpp
-  ${PROJECT_SOURCE_DIR}/src/device/base/DeviceBase.h
-  ${PROJECT_SOURCE_DIR}/src/device/base/DeviceBase.cpp
+  ${PROJECT_SOURCE_DIR}/src/device/base/IDevice.h
+  ${PROJECT_SOURCE_DIR}/src/device/base/IDevice.cpp
   ${PROJECT_SOURCE_DIR}/src/common/AVError.h
-  ${PROJECT_SOURCE_DIR}/src/format/AVFormatBase.h
-  ${PROJECT_SOURCE_DIR}/src/format/AVFormatBase.cpp
-  ${PROJECT_SOURCE_DIR}/src/common/base/AVDataSinkBase.h
-  ${PROJECT_SOURCE_DIR}/src/common/base/AVDataSourceBase.h
+  ${PROJECT_SOURCE_DIR}/src/format/IAVFormat.h
+  ${PROJECT_SOURCE_DIR}/src/format/IAVFormat.cpp
+  ${PROJECT_SOURCE_DIR}/src/common/base/IAVDataSink.h
+  ${PROJECT_SOURCE_DIR}/src/common/base/IAVDataSource.h
 )
 
 set(AVDEVICE_SRC
@@ -23,8 +23,8 @@ set(AVDEVICE_SRC
   ${PROJECT_SOURCE_DIR}/src/codec/AudioEncoder.cpp
   ${PROJECT_SOURCE_DIR}/src/codec/VideoEncoder.h
   ${PROJECT_SOURCE_DIR}/src/codec/VideoEncoder.cpp
-  ${PROJECT_SOURCE_DIR}/src/codec/base/EncoderBase.h
-  ${PROJECT_SOURCE_DIR}/src/codec/base/EncoderBase.cpp
+  ${PROJECT_SOURCE_DIR}/src/codec/base/IEncoder.h
+  ${PROJECT_SOURCE_DIR}/src/codec/base/IEncoder.cpp
 )
 
 include_directories("${FFMPEG_DIR}/include")

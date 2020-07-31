@@ -35,11 +35,11 @@ extern "C" {
 
 #include "AVGuard.h"
 #include "AVError.h"
-#include "DeviceBase.h"
+#include "IDevice.h"
 
 namespace edision {
 
-class VideoRecorder : public InputDeviceBase {
+class VideoRecorder : public IInputDevice {
 public:
   VideoRecorder();
   ~VideoRecorder();
@@ -50,7 +50,7 @@ public:
 
   virtual AV_RET readData() override;
 
-  virtual AV_RET setFormat(std::shared_ptr<AVFormatBase> fmt) override;
+  virtual AV_RET setFormat(std::shared_ptr<IAVFormat> fmt) override;
 
 private:
   AVDictionary* _mVideoOptionals;

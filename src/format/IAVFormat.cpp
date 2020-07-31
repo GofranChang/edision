@@ -1,9 +1,9 @@
-#include "AVFormatBase.h"
+#include "IAVFormat.h"
 
 namespace edision {
 
 // AVFormatBase
-AVFormatBase::AVFormatBase(MediaType type) : _mMediaType(type) {
+IAVFormat::IAVFormat(MediaType type) : _mMediaType(type) {
 }
 
 // VideoFormat
@@ -14,7 +14,7 @@ VideoFormatBase::VideoFormatBase(VideoFormatType type, \
                                   int height) : _mVideoFormat(type)
                                               , _mWidth(width)
                                               , _mHeight(height)
-                                              , AVFormatBase(VideoType) {
+                                              , IAVFormat(VideoType) {
 }
 
 // YUVFormat

@@ -1,4 +1,4 @@
-#include "DeviceBase.h"
+#include "IDevice.h"
 #include "MyLogger.h"
 #include "AudioDevice.h"
 #include "VideoDevice.h"
@@ -19,16 +19,16 @@ extern "C" {
 
 namespace edision {
 
-InputDeviceBase::InputDeviceBase() : _mOutputPkt(NULL)
-                                   , _mInputFmtCtx(NULL) {
+IInputDevice::IInputDevice() : _mOutputPkt(NULL)
+                             , _mInputFmtCtx(NULL) {
 }
 
-InputDeviceBase::~InputDeviceBase() {
+IInputDevice::~IInputDevice() {
   uninit();
 }
 
-std::shared_ptr<InputDeviceBase> InputDeviceBase::createNew(DeviceType type) {
-  std::shared_ptr<InputDeviceBase> res(nullptr);
+std::shared_ptr<IInputDevice> IInputDevice::createNew(DeviceType type) {
+  std::shared_ptr<IInputDevice> res(nullptr);
 
   switch (type) {
   case DEVICE_CAMERA:
@@ -45,7 +45,7 @@ std::shared_ptr<InputDeviceBase> InputDeviceBase::createNew(DeviceType type) {
   return res;
 }
 
-AV_RET InputDeviceBase::init(std::string inputName, std::string formatName) {
+AV_RET IInputDevice::init(std::string inputName, std::string formatName) {
   avdevice_register_all();
 
   int ret = avformat_open_input(&_mInputFmtCtx, inputName.c_str(), av_find_input_format(formatName.c_str()), NULL);
@@ -67,12 +67,12 @@ AV_RET InputDeviceBase::init(std::string inputName, std::string formatName) {
   return AV_SUCCESS;
 }
 
-AV_RET InputDeviceBase::setFormat(std::shared_ptr<AVFormatBase> fmt) {
+AV_RET IInputDevice::setFormat(std::shared_ptr<IAVFormat> fmt) {
   _mFmtBase = fmt;
   return AV_SUCCESS;
 }
 
-void InputDeviceBase::uninit() {
+void IInputDevice::uninit() {
   if (NULL != _mInputFmtCtx) {
     avformat_close_input(&_mInputFmtCtx);
   }

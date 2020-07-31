@@ -19,7 +19,7 @@
 
 namespace edision {
 
-class AVDataSinkBase {
+class IAVDataSink {
 public:
   virtual void onData(uint8_t* data, size_t size) = 0;
 };

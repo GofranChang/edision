@@ -33,19 +33,19 @@ extern "C" {
 }
 #endif
 
-#include "base/AVDataSinkBase.h"
-#include "base/AVDataSourceBase.h"
+#include "base/IAVDataSink.h"
+#include "base/IAVDataSource.h"
 #include "AVError.h"
-#include "EncoderBase.h"
+#include "IEncoder.h"
 
 namespace edision {
 
-class VideoEncoder : public EncoderBase {
+class VideoEncoder : public IEncoder {
 public:
   VideoEncoder(std::string& codecName);
   ~VideoEncoder();
 
-  AV_RET setConfig(std::shared_ptr<AVFormatBase> srcFmt, std::shared_ptr<AVFormatBase> dstFmt) override;
+  AV_RET setConfig(std::shared_ptr<IAVFormat> srcFmt, std::shared_ptr<IAVFormat> dstFmt) override;
   
   AV_RET encode(const uint8_t* data, size_t size) override;
   

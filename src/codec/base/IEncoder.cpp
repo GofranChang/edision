@@ -11,15 +11,15 @@
  * This file is part of Edision.
  */
 
-#include "EncoderBase.h"
+#include "IEncoder.h"
 #include "MyLogger.h"
-#include "AudioEncoder.h"
 #include "VideoEncoder.h"
+#include "AudioEncoder.h"
 
 namespace edision {
 
-std::shared_ptr<EncoderBase> EncoderBase::createNew(CodecType type, std::string& codecName) {
-  std::shared_ptr<EncoderBase> res(nullptr);
+std::shared_ptr<IEncoder> IEncoder::createNew(CodecType type, std::string& codecName) {
+  std::shared_ptr<IEncoder> res(nullptr);
 
   switch (type) {
   case AUDIO_ENCODER:
@@ -37,14 +37,14 @@ std::shared_ptr<EncoderBase> EncoderBase::createNew(CodecType type, std::string&
   return res;
 }
 
-EncoderBase::EncoderBase(std::string& codecName) : _mCodecName(codecName)
+IEncoder::IEncoder(std::string& codecName) : _mCodecName(codecName)
                                                  , _mCodecCtx(NULL)
                                                  , _mCodec(NULL)
                                                  , _mFrame(NULL)
                                                  , _mPacket(NULL) {
 }
 
-AV_RET EncoderBase::init() {
+AV_RET IEncoder::init() {
   avcodec_register_all();
 
   _mCodec = avcodec_find_encoder_by_name(_mCodecName.c_str());
@@ -74,7 +74,7 @@ AV_RET EncoderBase::init() {
   return AV_SUCCESS;
 }
 
-void EncoderBase::uninit() {
+void IEncoder::uninit() {
   if (_mCodecCtx != NULL)
     avcodec_free_context(&_mCodecCtx);
     

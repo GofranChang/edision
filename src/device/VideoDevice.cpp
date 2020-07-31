@@ -86,11 +86,11 @@ void VideoRecorder::uninit() {
  *                eg. In macos is "avfoundation"
  *
  */
-AV_RET VideoRecorder::setFormat(std::shared_ptr<AVFormatBase> fmt) {
+AV_RET VideoRecorder::setFormat(std::shared_ptr<IAVFormat> fmt) {
   avdevice_register_all();
 
   //TODO: Set optionals
-  InputDeviceBase::setFormat(fmt);
+  IInputDevice::setFormat(fmt);
 
   if (fmt->_mMediaType != VideoType) {
     LOGE("V Recoder", "Set video recorder format failed, format type not video");

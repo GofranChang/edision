@@ -39,28 +39,28 @@ enum VideoFormatType {
 /** 
  * AVFormatBase
  */
-struct AVFormatBase {
+struct IAVFormat {
   MediaType _mMediaType;
 
-  AVFormatBase(MediaType type);
+  IAVFormat(MediaType type);
 };
 
 /** 
  * AudioFormatBase
  */
-struct AudioFormatBase : public AVFormatBase {
+struct AudioFormatBase : public IAVFormat {
   AVSampleFormat _mSampleFmt;
   int            _mSampleRate;
   uint64_t       _mChannelLayout;
   int            _mProfile;
   
-  AudioFormatBase() : AVFormatBase(AudioType) {}
+  AudioFormatBase() : IAVFormat(AudioType) {}
 };
 
 /** 
  * VideoFormatBase
  */
-struct VideoFormatBase : public AVFormatBase {
+struct VideoFormatBase : public IAVFormat {
   VideoFormatType _mVideoFormat;
   int             _mWidth;
   int             _mHeight;

@@ -18,22 +18,22 @@
 #include <stddef.h>
 #include <memory>
 
-#include "AVDataSinkBase.h"
+#include "IAVDataSink.h"
 
 namespace edision {
 
-class AVDataSourceBase {
+class IAVDataSource {
 public:
-  AVDataSourceBase() : _mDataSink(nullptr) {
+  IAVDataSource() : _mDataSink(nullptr) {
   }
-  ~AVDataSourceBase() = default;
+  ~IAVDataSource() = default;
   
-  inline void setDataSink(std::shared_ptr<AVDataSinkBase> dataSink) {
+  inline void setDataSink(std::shared_ptr<IAVDataSink> dataSink) {
     _mDataSink = dataSink;
   }
   
 protected:
-  std::shared_ptr<AVDataSinkBase> _mDataSink;
+  std::shared_ptr<IAVDataSink> _mDataSink;
 };
 
 } // namespace edision

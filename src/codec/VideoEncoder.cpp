@@ -18,7 +18,7 @@
 
 namespace edision {
 
-VideoEncoder::VideoEncoder(std::string& codecName) : EncoderBase(codecName)
+VideoEncoder::VideoEncoder(std::string& codecName) : IEncoder(codecName)
                                                    , _mPts(0) {
 }
 
@@ -26,7 +26,7 @@ VideoEncoder::~VideoEncoder() {
   uninit();
 }
 
-AV_RET VideoEncoder::setConfig(std::shared_ptr<AVFormatBase> srcFmt, std::shared_ptr<AVFormatBase> dstFmt) {
+AV_RET VideoEncoder::setConfig(std::shared_ptr<IAVFormat> srcFmt, std::shared_ptr<IAVFormat> dstFmt) {
   _mFormat = dstFmt;
   
   VideoFormatBase* dstVideoFmtBase = static_cast<VideoFormatBase*>(_mFormat.get());
