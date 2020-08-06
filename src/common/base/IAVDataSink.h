@@ -11,8 +11,8 @@
  * This file is part of Edision.
  */
 
-#ifndef __EDISION_COMMON_BASE_AVSINKBASE__
-#define __EDISION_COMMON_BASE_AVSINKBASE__
+#ifndef __EDISION_COMMON_BASE_IAVSINK__
+#define __EDISION_COMMON_BASE_IAVSINK__
 
 #include <stdint.h>
 #include <stddef.h>
@@ -26,4 +26,4 @@ public:
 
 } // namespace edision
 
-#endif // __EDISION_COMMON_BASE_AVSINKBASE__
+#endif // __EDISION_COMMON_BASE_IAVSINK__

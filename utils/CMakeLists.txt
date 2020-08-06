@@ -11,6 +11,10 @@ file(GLOB SPDLOG_SRC
   "log/spdlog/sinks/*.h"
 )
 
+if(IOS)
+add_definitions(-DSPDLOG_NO_TLS)
+endif()
+
 include_directories("log")
 source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${LOGGER_SRC} ${SPDLOG_SRC})
 

@@ -1,5 +1,5 @@
-#ifndef __EDISION_DEVICE_INPUTDEVICEBASE_H__
-#define __EDISION_DEVICE_INPUTDEVICEBASE_H__
+#ifndef __EDISION_DEVICE_IDEVICE_H__
+#define __EDISION_DEVICE_IDEVICE_H__
 
 #include <memory>
 
@@ -39,4 +39,4 @@ protected:
 
 } // namespace edision 
 
-#endif
+#endif // __EDISION_DEVICE_IDEVICE_H__

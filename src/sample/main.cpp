@@ -65,6 +65,7 @@ int main(int argc, const char* argv[]) {
     audioRecorder->readData();
 #endif
   
+#ifdef CAPTURE_YUV
   /**
    * Recoder Video test
    */
@@ -84,14 +85,16 @@ int main(int argc, const char* argv[]) {
   
   for (int i = 0; i < 500; i++)
     videoRecorder->readData();
+#endif
 
-#ifdef ENCODE_H264_TEST
+//#ifdef ENCODE_H264_TEST
+#if 1
   /**
    * Encoder yuv to h264 test
    */
   ////////////////////////////////////////////////////////
   std::string encoderName = "libx264";
-  std::shared_ptr<EncoderBase> encoder(EncoderBase::createNew(VIDEO_ENCODER, encoderName));
+  std::shared_ptr<IEncoder> encoder(IEncoder::createNew(VIDEO_ENCODER, encoderName));
   encoder->init();
   
   std::shared_ptr<YUVFormat> inputFmt(new YUVFormat(AV_PIX_FMT_YUV420P, 1280, 720));

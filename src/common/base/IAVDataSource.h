@@ -11,8 +11,8 @@
  * This file is part of Edision.
  */
 
-#ifndef __EDISION_COMMON_BASE_AV_SOURCE_BASE__
-#define __EDISION_COMMON_BASE_AV_SOURCE_BASE__
+#ifndef __EDISION_COMMON_BASE_IAVSOURCE__
+#define __EDISION_COMMON_BASE_IAVSOURCE__
 
 #include <stdint.h>
 #include <stddef.h>
@@ -38,4 +38,4 @@ protected:
 
 } // namespace edision
 
-#endif // __EDISION_COMMON_BASE_AV_SOURCE_BASE__
+#endif // __EDISION_COMMON_BASE_IAVSOURCE__

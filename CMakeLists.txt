@@ -20,7 +20,10 @@ include(CheckSymbolExists)
 include(CheckCXXCompilerFlag)
 
 if(NOT FFMPEG_DIR)
-  set(FFMPEG_DIR "/usr/local/ffmpeg")
+  # set(FFMPEG_DIR "/usr/local/ffmpeg")
+  if(IOS)
+    set(FFMPEG_DIR "${PROJECT_SOURCE_DIR}/deps/iOS")
+  endif()
 endif()
 
 add_subdirectory(utils)

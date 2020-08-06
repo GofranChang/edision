@@ -1,11 +1,15 @@
-#ifndef __EDISION_FORMAT_AVFORMAT_BASE_H__
-#define __EDISION_FORMAT_AVFORMAT_BASE_H__
+#ifndef __EDISION_FORMAT_IAVFORMAT_H__
+#define __EDISION_FORMAT_IAVFORMAT_H__
 
 #ifdef __cplusplus 
 extern "C" { 
 #endif
 
+#ifndef __APPLE1__
 #include "libavformat/avformat.h"
+#else
+#include "avformat.h"
+#endif
 
 #ifdef __cplusplus 
 } 
@@ -111,4 +115,4 @@ struct H264Format : public VideoFormatBase {
 
 } // namespace edision
 
-#endif
+#endif // __EDISION_FORMAT_IAVFORMAT_H__

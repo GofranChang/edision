@@ -41,13 +41,34 @@ source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${AVCOMMON_SRC} ${AVDEVICE_SRC})
 
 #set_target_properties(audiocapture PROPERTIES RESOURCE "${PROJECT_SOURCE_DIR}/src/device/Info.plist")
 
-add_library(edision ${AVDEVICE_SRC} ${AVCOMMON_SRC})
+add_library(edision SHARED ${AVDEVICE_SRC} ${AVCOMMON_SRC})
 # set_target_properties(audiocapture PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/src/device/Info.plist)
 
-target_link_libraries(edision avformat avutil avdevice avcodec swresample logger)
+target_link_libraries(edision postproc swscale avfilter avformat avutil avdevice avcodec swresample x264 fdk-aac logger)
 
 if(IOS)
 message("IOS 编译设置")
+
+add_definitions(-DSPDLOG_NO_TLS)
+
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fembed-bitcode")
+# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fembed-bitcode")
+
+target_link_libraries(edision
+  # PRIVATE luaframework
+  PRIVATE "-framework Foundation"
+  PRIVATE "-framework AVFoundation"
+  PRIVATE "-framework CoreGraphics"
+  PRIVATE "-framework CoreMedia"
+  PRIVATE "-framework VideoToolbox"
+  PRIVATE "-framework AudioToolbox"
+  PRIVATE "-framework CoreImage"
+  PRIVATE "-framework CoreAudio"
+  PRIVATE "-framework CoreVideo"
+  PRIVATE "iconv"
+  PRIVATE "bz2"
+  PRIVATE "z"
+)
 
 set_target_properties(edision PROPERTIES
 FRAMEWORK TRUE
@@ -71,34 +92,3 @@ set(SAMPLE_SRC
 add_executable(edisionTest ${SAMPLE_SRC})
 
 target_link_libraries(edisionTest edision)
-
-# function(assign_source_group)
-#     foreach(_source IN ITEMS ${ARGN})
-#         if (IS_ABSOLUTE "${_source}")
-#             file(RELATIVE_PATH _source_rel "${CMAKE_CURRENT_SOURCE_DIR}" "${_source}")
-#         else()
-#             set(_source_rel "${_source}")
-#         endif()
-#         get_filename_component(_source_path "${_source_rel}" PATH)
-#         string(REPLACE "/" "\\" _source_path_msvc "${_source_path}")
-#         source_group("${_source_path_msvc}" FILES "${_source}")
-#     endforeach()
-# endfunction(assign_source_group)
-
-# if(WIN32)
-#   if(MINGW)
-#     message("MINGW 编译设置")
-#   else()
-#     message("WIN32 编译设置")
-#   endif()
-# elseif(APPLE)
-#   set(CMAKE_FRAMEWORK_PATH "../../deps/${BUILD_PLATFORM}")
-#   if(IOS)
-#     message("IOS 编译设置")
-#   else()
-#     message("MAC 编译设置")
-#   endif()
-# elseif(ANDROID)
-#   message("ANDROID 编译设置")
-# endif()
-
