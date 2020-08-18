@@ -5,11 +5,7 @@
 extern "C" { 
 #endif
 
-#ifndef __APPLE1__
 #include "libavformat/avformat.h"
-#else
-#include "avformat.h"
-#endif
 
 #ifdef __cplusplus 
 } 

@@ -27,6 +27,14 @@ set(AVDEVICE_SRC
   ${PROJECT_SOURCE_DIR}/src/codec/base/IEncoder.cpp
 )
 
+set(HEADER_FILES
+  ${PROJECT_SOURCE_DIR}/src/device/base/IDevice.h
+  ${PROJECT_SOURCE_DIR}/src/format/IAVFormat.h
+  ${PROJECT_SOURCE_DIR}/src/common/base/IAVDataSink.h
+  ${PROJECT_SOURCE_DIR}/src/common/base/IAVDataSource.h
+  ${PROJECT_SOURCE_DIR}/src/codec/base/IEncoder.h
+)
+
 include_directories("${FFMPEG_DIR}/include")
 include_directories("${PROJECT_SOURCE_DIR}/src/common")
 include_directories("${PROJECT_SOURCE_DIR}/src/device")
@@ -36,6 +44,10 @@ include_directories("${PROJECT_SOURCE_DIR}/src/codec/base")
 include_directories("${PROJECT_SOURCE_DIR}/src/device/base")
 
 link_directories("${FFMPEG_DIR}/lib")
+link_directories("${X264_DIR}")
+link_directories("${X265_DIR}")
+link_directories("${FDK_AAC_DIR}")
+link_directories("${SDL2_DIR}")
 
 source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${AVCOMMON_SRC} ${AVDEVICE_SRC})
 
@@ -46,13 +58,37 @@ add_library(edision SHARED ${AVDEVICE_SRC} ${AVCOMMON_SRC})
 
 target_link_libraries(edision postproc swscale avfilter avformat avutil avdevice avcodec swresample x264 fdk-aac logger)
 
+set(CMAKE_FRAMEWORK_PATH "${SDL2_DIR}")
+# set_target_properties(edision PROPERTIES
+  #  LINK_FLAGS "-Wl,-F${SDL2_DIR}/SDL2.framework"
+  #  FRAMEWORK_SEARCH_PATHS ${SDL2_DIR}
+  # -read_only_relocs suppress
+# )
+
+# target_link_libraries(edision
+#   # PRIVATE luaframework
+#   PRIVATE "-framework Cocoa"
+#   PRIVATE "-framework Foundation"
+#   PRIVATE "-framework AVFoundation"
+#   PRIVATE "-framework CoreGraphics"
+#   PRIVATE "-framework CoreMedia"
+#   PRIVATE "-framework VideoToolbox"
+#   PRIVATE "-framework AudioToolbox"
+#   PRIVATE "-framework CoreImage"
+#   PRIVATE "-framework CoreAudio"
+#   PRIVATE "-framework CoreVideo"
+#   PRIVATE "-framework OpenGL"
+#   PRIVATE "-framework Security"
+#   # PRIVATE "-framework SDL2"
+#   PRIVATE "iconv"
+#   PRIVATE "bz2"
+#   PRIVATE "z"
+# )
+
 if(IOS)
 message("IOS 编译设置")
 
 add_definitions(-DSPDLOG_NO_TLS)
-
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fembed-bitcode")
-# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fembed-bitcode")
 
 target_link_libraries(edision
   # PRIVATE luaframework
@@ -79,7 +115,7 @@ MACOSX_FRAMEWORK_IDENTIFIER cn.tvm.tvm_model
 VERSION 1.0.0
 # "compatibility version" in semantic format in Mach-O binary file
 SOVERSION 1.0.0
-PUBLIC_HEADER "${HEADER_FILES1}"
+PUBLIC_HEADER "${HEADER_FILES}"
 RESOURCE      "${RESOURCE_FILES}"
 # XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer"
 )

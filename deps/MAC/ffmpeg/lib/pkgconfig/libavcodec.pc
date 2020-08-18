@@ -1,14 +1,14 @@
-prefix=/usr/local/ffmpeg
+prefix=./output
 exec_prefix=${prefix}
-libdir=/usr/local/ffmpeg/lib
-includedir=/usr/local/ffmpeg/include
+libdir=./output/lib
+includedir=./output/include
 
 Name: libavcodec
 Description: FFmpeg codec library
-Version: 57.107.100
-Requires: libswresample >= 2.9.100, libavutil >= 55.78.100
+Version: 58.91.100
+Requires: libswresample >= 3.7.100, libavutil >= 56.51.100
 Requires.private: 
 Conflicts:
-Libs: -L${libdir}  -lavcodec -framework OpenGL -framework OpenGL -framework Foundation -framework CoreVideo -framework CoreMedia -L/usr/local/lib -lSDL2 -framework CoreFoundation -framework VideoToolbox -framework CoreMedia -framework CoreVideo -framework VideoDecodeAcceleration -L/usr/local/lib -lSDL2 -liconv -Wl,-framework,CoreFoundation -Wl,-framework,Security -L/usr/local/lib -lSDL2 -L/usr/local/lib -lx265 -L/usr/local/lib -lx264 -L/usr/local/lib -lfdk-aac -lm -lbz2 -lz -pthread -pthread -framework CoreServices -framework CoreGraphics -framework VideoToolbox -framework CoreImage -framework AVFoundation -framework AudioToolbox -framework AppKit
+Libs: -L${libdir}  -lavcodec -liconv -lm -lz -framework AudioToolbox -L/usr/local/lib -lfdk-aac -L/usr/local/lib -lx264 -L/usr/local/lib -lx265 -pthread -framework VideoToolbox -framework CoreFoundation -framework CoreMedia -framework CoreVideo -framework CoreServices
 Libs.private: 
 Cflags: -I${includedir}

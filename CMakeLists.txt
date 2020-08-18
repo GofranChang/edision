@@ -6,7 +6,7 @@ if(NOT CMAKE_BUILD_TYPE)
     FORCE)
 endif()
 
-project(ffmpegDemo)
+project(edision)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -19,20 +19,11 @@ include(CheckFunctionExists)
 include(CheckSymbolExists)
 include(CheckCXXCompilerFlag)
 
-if(NOT FFMPEG_DIR)
-  # set(FFMPEG_DIR "/usr/local/ffmpeg")
-  if(IOS)
-    set(FFMPEG_DIR "${PROJECT_SOURCE_DIR}/deps/iOS")
-  endif()
-endif()
+set(FFMPEG_DIR "${PROJECT_SOURCE_DIR}/deps/${BUILD_PLATFORM}/ffmpeg")
+set(X264_DIR "${PROJECT_SOURCE_DIR}/deps/${BUILD_PLATFORM}/x264")
+set(X265_DIR "${PROJECT_SOURCE_DIR}/deps/${BUILD_PLATFORM}/x265")
+set(SDL2_DIR "${PROJECT_SOURCE_DIR}/deps/${BUILD_PLATFORM}/sdl2")
+set(FDK_AAC_DIR "${PROJECT_SOURCE_DIR}/deps/${BUILD_PLATFORM}/fdk-aac")
 
 add_subdirectory(utils)
 add_subdirectory(src)
-
-#set_target_properties(ffmpegDemo PROPERTIES
-#  MACOSX_BUNDLE TRUE
-#  MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/src/device/Info.plist
-#)
-# include_directories(device)
-
-# include_directories("./deps/MAC/ffmpeg/include")
