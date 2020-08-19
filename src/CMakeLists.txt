@@ -51,75 +51,85 @@ link_directories("${SDL2_DIR}")
 
 source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${AVCOMMON_SRC} ${AVDEVICE_SRC})
 
-#set_target_properties(audiocapture PROPERTIES RESOURCE "${PROJECT_SOURCE_DIR}/src/device/Info.plist")
+if(APPLE)
+  if(IOS)
+    # IOS Build setting
+    message("IOS Build")
+    add_definitions(-DSPDLOG_NO_TLS)
+    set(PLATFORM_LIB
+      "-framework Foundation"
+      "-framework AVFoundation"
+      "-framework CoreGraphics"
+      "-framework CoreMedia"
+      "-framework VideoToolbox"
+      "-framework AudioToolbox"
+      "-framework CoreImage"
+      "-framework CoreAudio"
+      "-framework CoreVideo"
+      "iconv"
+      "bz2"
+      "z"
+    )
+    # set_target_properties(edision PROPERTIES
+    #   LINK_FLAGS "-read_only_relocs suppress"
+    #   #  FRAMEWORK_SEARCH_PATHS ${SDL2_DIR}
+    #   # -read_only_relocs suppress
+    # )
+  else()
+    # MACOS Build setting
+    message("MAC Build")
+    set(CMAKE_FRAMEWORK_PATH "${SDL2_DIR}")
+    find_library(
+      SDL2_LIB
+      SDL2_framework
+    )
+    set(PLATFORM_LIB
+      # PRIVATE luaframework
+      "-framework Cocoa"
+      "-framework Foundation"
+      "-framework AVFoundation"
+      "-framework CoreGraphics"
+      "-framework CoreMedia"
+      "-framework VideoToolbox"
+      "-framework AudioToolbox"
+      "-framework CoreImage"
+      "-framework CoreAudio"
+      "-framework CoreVideo"
+      "-framework OpenGL"
+      "-framework Security"
+      "iconv"
+      "bz2"
+      "z"
+      ${SDL2_LIB}
+    )
+  endif(IOS)
+endif(APPLE)
 
 add_library(edision SHARED ${AVDEVICE_SRC} ${AVCOMMON_SRC})
-# set_target_properties(audiocapture PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/src/device/Info.plist)
 
-target_link_libraries(edision postproc swscale avfilter avformat avutil avdevice avcodec swresample x264 fdk-aac logger)
+target_link_libraries(edision postproc swscale avfilter avformat avutil avdevice avcodec swresample x264 fdk-aac logger ${PLATFORM_LIB})
 
-set(CMAKE_FRAMEWORK_PATH "${SDL2_DIR}")
-# set_target_properties(edision PROPERTIES
-  #  LINK_FLAGS "-Wl,-F${SDL2_DIR}/SDL2.framework"
-  #  FRAMEWORK_SEARCH_PATHS ${SDL2_DIR}
-  # -read_only_relocs suppress
-# )
-
-# target_link_libraries(edision
-#   # PRIVATE luaframework
-#   PRIVATE "-framework Cocoa"
-#   PRIVATE "-framework Foundation"
-#   PRIVATE "-framework AVFoundation"
-#   PRIVATE "-framework CoreGraphics"
-#   PRIVATE "-framework CoreMedia"
-#   PRIVATE "-framework VideoToolbox"
-#   PRIVATE "-framework AudioToolbox"
-#   PRIVATE "-framework CoreImage"
-#   PRIVATE "-framework CoreAudio"
-#   PRIVATE "-framework CoreVideo"
-#   PRIVATE "-framework OpenGL"
-#   PRIVATE "-framework Security"
-#   # PRIVATE "-framework SDL2"
-#   PRIVATE "iconv"
-#   PRIVATE "bz2"
-#   PRIVATE "z"
-# )
-
-if(IOS)
-message("IOS 编译设置")
-
-add_definitions(-DSPDLOG_NO_TLS)
-
-target_link_libraries(edision
-  # PRIVATE luaframework
-  PRIVATE "-framework Foundation"
-  PRIVATE "-framework AVFoundation"
-  PRIVATE "-framework CoreGraphics"
-  PRIVATE "-framework CoreMedia"
-  PRIVATE "-framework VideoToolbox"
-  PRIVATE "-framework AudioToolbox"
-  PRIVATE "-framework CoreImage"
-  PRIVATE "-framework CoreAudio"
-  PRIVATE "-framework CoreVideo"
-  PRIVATE "iconv"
-  PRIVATE "bz2"
-  PRIVATE "z"
+if(APPLE)
+set_target_properties(edision PROPERTIES
+      LINK_FLAGS "-read_only_relocs suppress"
+      #  FRAMEWORK_SEARCH_PATHS ${SDL2_DIR}
+      # -read_only_relocs suppress
 )
 
 set_target_properties(edision PROPERTIES
-FRAMEWORK TRUE
-FRAMEWORK_VERSION A
-MACOSX_FRAMEWORK_IDENTIFIER cn.tvm.tvm_model
-# MACOSX_FRAMEWORK_INFO_PLIST Info.plist
-# "current version" in semantic format in Mach-O binary file
-VERSION 1.0.0
-# "compatibility version" in semantic format in Mach-O binary file
-SOVERSION 1.0.0
-PUBLIC_HEADER "${HEADER_FILES}"
-RESOURCE      "${RESOURCE_FILES}"
-# XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer"
+    FRAMEWORK TRUE
+    FRAMEWORK_VERSION A
+    # MACOSX_FRAMEWORK_IDENTIFIER cn.tvm.tvm_model
+    # MACOSX_FRAMEWORK_INFO_PLIST Info.plist
+    # "current version" in semantic format in Mach-O binary file
+    VERSION 1.0.0
+    # "compatibility version" in semantic format in Mach-O binary file
+    SOVERSION 1.0.0
+    PUBLIC_HEADER "${HEADER_FILES}"
+    RESOURCE      "${RESOURCE_FILES}"
+    # XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer"
 )
-endif()
+endif(APPLE)
 
 set(SAMPLE_SRC
   ${PROJECT_SOURCE_DIR}/src/sample/main.cpp
