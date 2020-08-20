@@ -1,14 +1,14 @@
 set(LOGGER_SRC
-  log/MyLogger.h
-  log/MyLogger.cpp
+    log/MyLogger.h
+    log/MyLogger.cpp
 )
 
 file(GLOB SPDLOG_SRC
-  "log/spdlog/*.h"
-  "log/spdlog/details/*.h"
-  "log/spdlog/fmt/*.h"
-  "log/spdlog/fmt/bundled/*.h"
-  "log/spdlog/sinks/*.h"
+    "log/spdlog/*.h"
+    "log/spdlog/details/*.h"
+    "log/spdlog/fmt/*.h"
+    "log/spdlog/fmt/bundled/*.h"
+    "log/spdlog/sinks/*.h"
 )
 
 if(IOS)
