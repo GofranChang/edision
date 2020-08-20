@@ -66,6 +66,7 @@ if(APPLE)
             "-framework CoreImage"
             "-framework CoreAudio"
             "-framework CoreVideo"
+            "-framework Security"
             "iconv"
             "bz2"
             "z"
