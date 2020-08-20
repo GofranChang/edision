@@ -65,7 +65,7 @@ int main(int argc, const char* argv[]) {
     audioRecorder->readData();
 #endif
   
-#ifdef CAPTURE_YUV
+#if 1
   /**
    * Recoder Video test
    */
@@ -88,7 +88,7 @@ int main(int argc, const char* argv[]) {
 #endif
 
 //#ifdef ENCODE_H264_TEST
-#if 1
+#if 0
   /**
    * Encoder yuv to h264 test
    */

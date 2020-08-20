@@ -83,7 +83,6 @@ if(APPLE)
             "-framework Cocoa"
             "-framework Foundation"
             "-framework AVFoundation"
-            "-framework CoreGraphics"
             "-framework CoreMedia"
             "-framework VideoToolbox"
             "-framework AudioToolbox"
@@ -95,6 +94,7 @@ if(APPLE)
             "iconv"
             "bz2"
             "z"
+            "lzma"
             "x265"
             ${SDL2_LIB}
         )
