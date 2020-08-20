@@ -50,15 +50,15 @@ AV_RET VideoRecorder::init(std::string inputName, std::string formatName) {
   if (ret < 0) {
     char errors[1024];
     av_strerror(ret, errors, 1024);
-    LOGE("A Recorder", "Open microphone error, error message \"{}\"", errors);
+    LOGE("V Recorder", "Open camera error, error message \"{}\"", errors);
     return AV_OPEN_INPUT_ERR;
   }
   
-  LOGI("A Recorder", "Open microphone {} success", inputName);
+  LOGI("V Recorder", "Open camera {} success", inputName);
 
   _mOutputPkt = av_packet_alloc();
   if (NULL == _mOutputPkt) {
-    LOGE("A Recorder", "Alloc AVPacket error");
+    LOGE("V Recorder", "Alloc AVPacket error");
     return AV_ALLOC_PACKET_ERR;
   }
 }
@@ -156,7 +156,7 @@ AV_RET VideoRecorder::setFormat(std::shared_ptr<IAVFormat> fmt) {
 AV_RET VideoRecorder::readData() {
   int ret = 0;
   if (NULL == _mOutputPkt || NULL == _mInputFmtCtx) {
-    LOGE("A Recoder", "Read frame error, format context or output packet null, maybe not initialize");
+    LOGE("V Recoder", "Read frame error, format context or output packet null, maybe not initialize");
     return AV_UNINITIALIZE;
   }
 
