@@ -52,6 +52,8 @@ link_directories("${SDL2_DIR}")
 source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${AVCOMMON_SRC} ${AVDEVICE_SRC})
 
 if(APPLE)
+    set(CMAKE_MACOSX_RPATH 1)
+    set(MACOSX_RPATH ".")
     if(IOS)
         # IOS Build setting
         message("IOS Build Setting")
@@ -110,11 +112,12 @@ if(APPLE)
 set_target_properties(edision PROPERTIES
     LINK_FLAGS "-read_only_relocs suppress"
 )
+# set(MACOSX_RPATH ".")
 
 set_target_properties(edision PROPERTIES
     FRAMEWORK TRUE
     FRAMEWORK_VERSION A
-    # MACOSX_FRAMEWORK_IDENTIFIER cn.tvm.tvm_model
+    MACOSX_FRAMEWORK_IDENTIFIER cn.edision.edision_model
     # MACOSX_FRAMEWORK_INFO_PLIST Info.plist
     # "current version" in semantic format in Mach-O binary file
     VERSION 1.0.0
