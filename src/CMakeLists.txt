@@ -52,6 +52,7 @@ link_directories("${SDL2_DIR}")
 source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${AVCOMMON_SRC} ${AVDEVICE_SRC})
 
 if(APPLE)
+    set(ENABLE_BITCODE 0)
     set(CMAKE_MACOSX_RPATH 1)
     set(MACOSX_RPATH ".")
     if(IOS)
@@ -72,6 +73,7 @@ if(APPLE)
             "iconv"
             "bz2"
             "z"
+            "postproc"
         )
     else()
         # MACOS Build setting
@@ -98,6 +100,7 @@ if(APPLE)
             "bz2"
             "z"
             "lzma"
+            "postproc"
             "x265"
             ${SDL2_LIB}
         )
@@ -106,7 +109,7 @@ endif(APPLE)
 
 add_library(edision SHARED ${AVDEVICE_SRC} ${AVCOMMON_SRC})
 
-target_link_libraries(edision postproc swscale avfilter avformat avutil avdevice avcodec swresample x264 fdk-aac logger ${PLATFORM_LIB})
+target_link_libraries(edision swscale avfilter avformat avutil avdevice avcodec swresample x264 fdk-aac logger ${PLATFORM_LIB})
 
 if(APPLE)
 set_target_properties(edision PROPERTIES
