@@ -35,6 +35,17 @@ set(HEADER_FILES
     ${PROJECT_SOURCE_DIR}/src/codec/base/IEncoder.h
 )
 
+set(FFMPEG_LIB
+    "swscale"
+    "avfilter"
+    "avformat"
+    "avutil"
+    "avdevice"
+    "avcodec"
+    "swresample"
+    "postproc"
+)
+
 include_directories("${FFMPEG_DIR}/include")
 include_directories("${PROJECT_SOURCE_DIR}/src/common")
 include_directories("${PROJECT_SOURCE_DIR}/src/device")
@@ -44,17 +55,17 @@ include_directories("${PROJECT_SOURCE_DIR}/src/codec/base")
 include_directories("${PROJECT_SOURCE_DIR}/src/device/base")
 
 link_directories("${FFMPEG_DIR}/lib")
-link_directories("${X264_DIR}")
-link_directories("${X265_DIR}")
-link_directories("${FDK_AAC_DIR}")
-link_directories("${SDL2_DIR}")
 
 source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${AVCOMMON_SRC} ${AVDEVICE_SRC})
 
 if(APPLE)
-    set(ENABLE_BITCODE 0)
     set(CMAKE_MACOSX_RPATH 1)
     set(MACOSX_RPATH ".")
+
+    set(X264_DIR "${PROJECT_SOURCE_DIR}/deps/${BUILD_PLATFORM}/x264")
+    set(FDK_AAC_DIR "${PROJECT_SOURCE_DIR}/deps/${BUILD_PLATFORM}/fdk-aac")
+    link_directories("${X264_DIR}")
+    link_directories("${FDK_AAC_DIR}")
     if(IOS)
         # IOS Build setting
         message("IOS Build Setting")
@@ -73,12 +84,17 @@ if(APPLE)
             "iconv"
             "bz2"
             "z"
-            "postproc"
+            "x264"
+            "fdk-aac"
         )
     else()
         # MACOS Build setting
         message("MAC Build Setting")
         set(CMAKE_FRAMEWORK_PATH "${SDL2_DIR}")
+        set(SDL2_DIR "${PROJECT_SOURCE_DIR}/deps/${BUILD_PLATFORM}/sdl2")
+        set(X265_DIR "${PROJECT_SOURCE_DIR}/deps/${BUILD_PLATFORM}/x265")
+        link_directories("${SDL2_DIR}")
+        link_directories("${X265_DIR}")
         find_library(
             SDL2_LIB
             SDL2
@@ -101,15 +117,17 @@ if(APPLE)
             "z"
             "lzma"
             "postproc"
-            "x265"
-            ${SDL2_LIB}
+            "x264"
+            "fdk-aac"
+            # "x265"
+            # ${SDL2_LIB}
         )
     endif(IOS)
 endif(APPLE)
 
 add_library(edision SHARED ${AVDEVICE_SRC} ${AVCOMMON_SRC})
 
-target_link_libraries(edision swscale avfilter avformat avutil avdevice avcodec swresample x264 fdk-aac logger ${PLATFORM_LIB})
+target_link_libraries(edision ${FFMPEG_LIB} logger ${PLATFORM_LIB})
 
 if(APPLE)
 set_target_properties(edision PROPERTIES

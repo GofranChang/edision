@@ -20,10 +20,6 @@ include(CheckSymbolExists)
 include(CheckCXXCompilerFlag)
 
 set(FFMPEG_DIR "${PROJECT_SOURCE_DIR}/deps/${BUILD_PLATFORM}/ffmpeg")
-set(X264_DIR "${PROJECT_SOURCE_DIR}/deps/${BUILD_PLATFORM}/x264")
-set(X265_DIR "${PROJECT_SOURCE_DIR}/deps/${BUILD_PLATFORM}/x265")
-set(SDL2_DIR "${PROJECT_SOURCE_DIR}/deps/${BUILD_PLATFORM}/sdl2")
-set(FDK_AAC_DIR "${PROJECT_SOURCE_DIR}/deps/${BUILD_PLATFORM}/fdk-aac")
 
 add_subdirectory(utils)
 add_subdirectory(src)
