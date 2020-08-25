@@ -61,6 +61,8 @@ AV_RET VideoRecorder::init(std::string inputName, std::string formatName) {
     LOGE("V Recorder", "Alloc AVPacket error");
     return AV_ALLOC_PACKET_ERR;
   }
+
+    return AV_SUCCESS;
 }
 
 void VideoRecorder::uninit() {

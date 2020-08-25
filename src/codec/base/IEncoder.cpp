@@ -45,7 +45,7 @@ IEncoder::IEncoder(std::string& codecName) : _mCodecName(codecName)
 }
 
 AV_RET IEncoder::init() {
-  avcodec_register_all();
+//  avcodec_register_all();
 
   _mCodec = avcodec_find_encoder_by_name(_mCodecName.c_str());
   if (NULL == _mCodec) {

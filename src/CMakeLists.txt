@@ -33,6 +33,7 @@ set(HEADER_FILES
     ${PROJECT_SOURCE_DIR}/src/common/base/IAVDataSink.h
     ${PROJECT_SOURCE_DIR}/src/common/base/IAVDataSource.h
     ${PROJECT_SOURCE_DIR}/src/codec/base/IEncoder.h
+    ${PROJECT_SOURCE_DIR}/src/common/AVError.h
 )
 
 set(FFMPEG_LIB
@@ -144,10 +145,27 @@ set_target_properties(edision PROPERTIES
     VERSION 1.0.0
     # "compatibility version" in semantic format in Mach-O binary file
     SOVERSION 1.0.0
-    PUBLIC_HEADER "${HEADER_FILES}"
+    # PUBLIC_HEADER "${HEADER_FILES}"
     RESOURCE      "${RESOURCE_FILES}"
     # XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer"
 )
+
+file(GLOB AVCODEC_HEADER
+    ${PROJECT_SOURCE_DIR}/deps/${BUILD_PLATFORM}/ffmpeg/include/libavcodec/*.h
+)
+
+#Copy header file
+set_property(SOURCE ${PROJECT_SOURCE_DIR}/src/device/base/IDevice.h PROPERTY MACOSX_PACKAGE_LOCATION Headers/)
+set_property(SOURCE ${PROJECT_SOURCE_DIR}/src/format/IAVFormat.h PROPERTY MACOSX_PACKAGE_LOCATION Headers/)
+set_property(SOURCE ${PROJECT_SOURCE_DIR}/src/codec/base/IEncoder.h PROPERTY MACOSX_PACKAGE_LOCATION Headers/)
+set_property(SOURCE ${PROJECT_SOURCE_DIR}/src/common/base/IAVDataSink.h PROPERTY MACOSX_PACKAGE_LOCATION Headers/base/)
+set_property(SOURCE ${PROJECT_SOURCE_DIR}/src/common/base/IAVDataSource.h PROPERTY MACOSX_PACKAGE_LOCATION Headers/base/)
+set_property(SOURCE ${PROJECT_SOURCE_DIR}/src/common/AVError.h PROPERTY MACOSX_PACKAGE_LOCATION Headers/)
+# foreach(hfile ${AVCODEC_HEADER})
+#     message("!!!!!!!!!!! : ${hfile}")
+#     set_property(SOURCE ${hfile} PROPERTY MACOSX_PACKAGE_LOCATION Headers/libavcodec/)
+# endforeach(hfile)
+
 endif(APPLE)
 
 set(SAMPLE_SRC
