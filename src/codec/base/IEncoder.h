@@ -19,8 +19,8 @@
 //#include <thread>
 //#include <time.h>
 
-#include "base/IAVDataSink.h"
-#include "base/IAVDataSource.h"
+#include "IAVDataSink.h"
+#include "IAVDataSource.h"
 #include "IAVFormat.h"
 #include "AVError.h"
 

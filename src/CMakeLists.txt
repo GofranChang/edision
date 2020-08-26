@@ -2,6 +2,11 @@ set(RESOURCE_FILES
     ${PROJECT_SOURCE_DIR}/README.md
 )
 
+set(CORE_SRC
+    ${PROJECT_SOURCE_DIR}/src/core/IEdisionCore.h
+    ${PROJECT_SOURCE_DIR}/src/core/IEdisionCore.cpp
+)
+
 set(AVCOMMON_SRC
     ${PROJECT_SOURCE_DIR}/src/common/AVGuard.h
     ${PROJECT_SOURCE_DIR}/src/common/AVGuard.cpp
@@ -28,6 +33,7 @@ set(AVDEVICE_SRC
 )
 
 set(HEADER_FILES
+    ${PROJECT_SOURCE_DIR}/src/core/IEdisionCore.h
     ${PROJECT_SOURCE_DIR}/src/device/base/IDevice.h
     ${PROJECT_SOURCE_DIR}/src/format/IAVFormat.h
     ${PROJECT_SOURCE_DIR}/src/common/base/IAVDataSink.h
@@ -49,6 +55,7 @@ set(FFMPEG_LIB
 
 include_directories("${FFMPEG_DIR}/include")
 include_directories("${PROJECT_SOURCE_DIR}/src/common")
+include_directories("${PROJECT_SOURCE_DIR}/src/common/base")
 include_directories("${PROJECT_SOURCE_DIR}/src/device")
 include_directories("${PROJECT_SOURCE_DIR}/src/codec")
 include_directories("${PROJECT_SOURCE_DIR}/src/format")
@@ -57,7 +64,7 @@ include_directories("${PROJECT_SOURCE_DIR}/src/device/base")
 
 link_directories("${FFMPEG_DIR}/lib")
 
-source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${AVCOMMON_SRC} ${AVDEVICE_SRC})
+source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${CORE_SRC} ${AVCOMMON_SRC} ${AVDEVICE_SRC})
 
 if(APPLE)
     set(CMAKE_MACOSX_RPATH 1)
@@ -126,7 +133,7 @@ if(APPLE)
     endif(IOS)
 endif(APPLE)
 
-add_library(edision SHARED ${AVDEVICE_SRC} ${AVCOMMON_SRC})
+add_library(edision SHARED ${CORE_SRC} ${AVDEVICE_SRC} ${AVCOMMON_SRC})
 
 target_link_libraries(edision ${FFMPEG_LIB} logger ${PLATFORM_LIB})
 
@@ -145,7 +152,7 @@ set_target_properties(edision PROPERTIES
     VERSION 1.0.0
     # "compatibility version" in semantic format in Mach-O binary file
     SOVERSION 1.0.0
-    # PUBLIC_HEADER "${HEADER_FILES}"
+    PUBLIC_HEADER "${HEADER_FILES}"
     RESOURCE      "${RESOURCE_FILES}"
     # XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer"
 )
@@ -153,18 +160,6 @@ set_target_properties(edision PROPERTIES
 file(GLOB AVCODEC_HEADER
     ${PROJECT_SOURCE_DIR}/deps/${BUILD_PLATFORM}/ffmpeg/include/libavcodec/*.h
 )
-
-#Copy header file
-set_property(SOURCE ${PROJECT_SOURCE_DIR}/src/device/base/IDevice.h PROPERTY MACOSX_PACKAGE_LOCATION Headers/)
-set_property(SOURCE ${PROJECT_SOURCE_DIR}/src/format/IAVFormat.h PROPERTY MACOSX_PACKAGE_LOCATION Headers/)
-set_property(SOURCE ${PROJECT_SOURCE_DIR}/src/codec/base/IEncoder.h PROPERTY MACOSX_PACKAGE_LOCATION Headers/)
-set_property(SOURCE ${PROJECT_SOURCE_DIR}/src/common/base/IAVDataSink.h PROPERTY MACOSX_PACKAGE_LOCATION Headers/base/)
-set_property(SOURCE ${PROJECT_SOURCE_DIR}/src/common/base/IAVDataSource.h PROPERTY MACOSX_PACKAGE_LOCATION Headers/base/)
-set_property(SOURCE ${PROJECT_SOURCE_DIR}/src/common/AVError.h PROPERTY MACOSX_PACKAGE_LOCATION Headers/)
-# foreach(hfile ${AVCODEC_HEADER})
-#     message("!!!!!!!!!!! : ${hfile}")
-#     set_property(SOURCE ${hfile} PROPERTY MACOSX_PACKAGE_LOCATION Headers/libavcodec/)
-# endforeach(hfile)
 
 endif(APPLE)
 

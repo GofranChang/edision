@@ -33,8 +33,8 @@ extern "C" {
 }
 #endif
 
-#include "base/IAVDataSink.h"
-#include "base/IAVDataSource.h"
+#include "IAVDataSink.h"
+#include "IAVDataSource.h"
 #include "AVError.h"
 #include "IEncoder.h"
 
