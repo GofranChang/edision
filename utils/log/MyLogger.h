@@ -12,34 +12,48 @@
 
 #define LOGGER_NAMESPACE my_media
 
+#define GET_LOGGER LOGGER_NAMESPACE::KooLogger::Instance()
+
 #define LOGT(logger, ...) do { \
-                auto retLogger = LOGGER_NAMESPACE::KooLogger::Instance()->getLogger(logger); \
-                SPDLOG_LOGGER_TRACE(retLogger, __VA_ARGS__); \
+                if (GET_LOGGER->isInit()) { \
+                  auto retLogger = LOGGER_NAMESPACE::KooLogger::Instance()->getLogger(logger); \
+                  SPDLOG_LOGGER_TRACE(retLogger, __VA_ARGS__); \
+                } \
               } while(0);
 
 #define LOGD(logger, ...) do { \
-                auto retLogger = LOGGER_NAMESPACE::KooLogger::Instance()->getLogger(logger); \
-                SPDLOG_LOGGER_DEBUG(retLogger, __VA_ARGS__); \
+                if (GET_LOGGER->isInit()) { \
+                  auto retLogger = LOGGER_NAMESPACE::KooLogger::Instance()->getLogger(logger); \
+                  SPDLOG_LOGGER_DEBUG(retLogger, __VA_ARGS__); \
+                } \
               } while(0);
 
 #define LOGI(logger, ...) do { \
-                auto retLogger = LOGGER_NAMESPACE::KooLogger::Instance()->getLogger(logger); \
-                SPDLOG_LOGGER_INFO(retLogger, __VA_ARGS__); \
+                if (GET_LOGGER->isInit()) { \
+                  auto retLogger = LOGGER_NAMESPACE::KooLogger::Instance()->getLogger(logger); \
+                  SPDLOG_LOGGER_INFO(retLogger, __VA_ARGS__); \
+                } \
               } while(0);
 
 #define LOGW(logger, ...) do { \
-                auto retLogger = LOGGER_NAMESPACE::KooLogger::Instance()->getLogger(logger); \
-                SPDLOG_LOGGER_WARN(retLogger, __VA_ARGS__); \
+                if (GET_LOGGER->isInit()) { \
+                  auto retLogger = LOGGER_NAMESPACE::KooLogger::Instance()->getLogger(logger); \
+                  SPDLOG_LOGGER_WARN(retLogger, __VA_ARGS__); \
+                } \
               } while(0);
 
 #define LOGE(logger, ...) do { \
-                auto retLogger = LOGGER_NAMESPACE::KooLogger::Instance()->getLogger(logger); \
-                SPDLOG_LOGGER_ERROR(retLogger, __VA_ARGS__); \
+                if (GET_LOGGER->isInit()) { \
+                  auto retLogger = LOGGER_NAMESPACE::KooLogger::Instance()->getLogger(logger); \
+                  SPDLOG_LOGGER_ERROR(retLogger, __VA_ARGS__); \
+                } \
               } while(0);
 
 #define LOGC(logger, ...) do { \
-                auto retLogger = LOGGER_NAMESPACE::KooLogger::Instance()->getLogger(logger); \
-                SPDLOG_LOGGER_CRITICAL(retLogger, __VA_ARGS__); \
+                if (GET_LOGGER->isInit()) { \
+                  auto retLogger = LOGGER_NAMESPACE::KooLogger::Instance()->getLogger(logger); \
+                  SPDLOG_LOGGER_CRITICAL(retLogger, __VA_ARGS__); \
+                } \
               } while(0);
 
 #define SINGLETON_DECLARE_LOG(className) \
@@ -68,12 +82,17 @@ private:
 
   std::mutex _m_LoggerMutex;
 
+  bool _mIsInit;
+
 private:
-  KooLogger() : _mLevel(spdlog::level::info) {
+  KooLogger() : _mLevel(spdlog::level::info)
+              , _mIsInit(false) {
   }
 
 public:
   void initLogger(spdlog::level::level_enum logLevel, bool isConsoleLog = false, std::string path = "", bool isSimpleLog = true);
+
+  inline bool isInit() { return _mIsInit; }
 
   void uninitLogger();
 

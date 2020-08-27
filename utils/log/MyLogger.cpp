@@ -23,6 +23,7 @@ void KooLogger::initLogger(spdlog::level::level_enum logLevel, bool isConsoleLog
   spdlog::flush_every(std::chrono::seconds(5));
 
   _mLevel = logLevel;
+  _mIsInit = true;
 }
 
 void KooLogger::uninitLogger() {
@@ -33,6 +34,8 @@ void KooLogger::uninitLogger() {
   for (auto i : _mLoggerList) {
     i.reset();
   }
+
+  _mIsInit = false;
 }
 
 void KooLogger::addLogger(std::string& loggerName) {
