@@ -24,9 +24,7 @@ namespace edision {
 *                eg. In macos is "avfoundation"
 *
 */
-VideoRecorder::VideoRecorder() : _mAVPkt(nullptr)
-                               , _mFmtCtx(nullptr)
-                               , _mVideoOptionals(nullptr) {
+VideoRecorder::VideoRecorder() : _mVideoOptionals(nullptr) {
 }
 
 /**
@@ -39,7 +37,46 @@ VideoRecorder::VideoRecorder() : _mAVPkt(nullptr)
 *
 */
 VideoRecorder::~VideoRecorder() {
-  uninit();
+}
+
+AV_RET VideoRecorder::init(std::string inputName, std::string formatName) {
+  if (nullptr == _mVideoOptionals) {
+    LOGE("V Recorder", "video optional is null, maybe not set record parameter");
+    return AV_UNINITIALIZE;
+  }
+  
+  avdevice_register_all();
+  int ret = avformat_open_input(&_mInputFmtCtx, inputName.c_str(), av_find_input_format(formatName.c_str()), &_mVideoOptionals);
+  if (ret < 0) {
+    char errors[1024];
+    av_strerror(ret, errors, 1024);
+    LOGE("V Recorder", "Open camera error, error message \"{}\"", errors);
+    return AV_OPEN_INPUT_ERR;
+  }
+  
+  LOGI("V Recorder", "Open camera {} success", inputName);
+
+  _mOutputPkt = av_packet_alloc();
+  if (NULL == _mOutputPkt) {
+    LOGE("V Recorder", "Alloc AVPacket error");
+    return AV_ALLOC_PACKET_ERR;
+  }
+
+    return AV_SUCCESS;
+}
+
+void VideoRecorder::uninit() {
+  if (NULL != _mInputFmtCtx) {
+    avformat_close_input(&_mInputFmtCtx);
+  }
+  
+  if (NULL != _mOutputPkt) {
+    av_packet_free(&_mOutputPkt);
+  }
+  
+  if (NULL != _mVideoOptionals) {
+    av_dict_free(&_mVideoOptionals);
+  }
 }
 
 /**
@@ -51,85 +88,58 @@ VideoRecorder::~VideoRecorder() {
  *                eg. In macos is "avfoundation"
  *
  */
-AV_RET VideoRecorder::init(std::string& devName, std::string& inpName, VideoConfig& cfg) {
+AV_RET VideoRecorder::setFormat(std::shared_ptr<IAVFormat> fmt) {
   avdevice_register_all();
 
   //TODO: Set optionals
-  _mVideoCfg = cfg;
+  IInputDevice::setFormat(fmt);
+
+  if (fmt->_mMediaType != VideoType) {
+    LOGE("V Recoder", "Set video recorder format failed, format type not video");
+    return AV_BAD_PARAMETER;
+  }
+
+  VideoFormatBase* videoFmtBase = static_cast<VideoFormatBase*>(fmt.get());
 
   // Set resolution
   char resolution[32];
   memset(resolution, '\0', 32);
-  sprintf(resolution, "%dx%d", _mVideoCfg._mWidth, _mVideoCfg._mHeight);
+  sprintf(resolution, "%dx%d", videoFmtBase->_mWidth, videoFmtBase->_mHeight);
   av_dict_set(&_mVideoOptionals, "video_size", resolution, 0);
 
   // Set frame rate
   char frameRate[8];
   memset(frameRate, '\0', 8);
-  sprintf(frameRate, "%d", _mVideoCfg._mFrameRate);
+  sprintf(frameRate, "%d", videoFmtBase->_mFrameRate);
   av_dict_set(&_mVideoOptionals, "framerate", frameRate, 0);
-  
-  av_dict_set(&_mVideoOptionals, "pixel_format", VideoConfig::_mFmtUpon[_mVideoCfg._mFmt].c_str(), 0);
 
-  switch (_mVideoCfg._mFmt) {
-  case AV_PIX_FMT_YUV444P:
-    _mFrameSize = _mVideoCfg._mWidth * _mVideoCfg._mHeight * 3;
-    break;
+  if (VIDEO_YUV == videoFmtBase->_mVideoFormat) {
+    YUVFormat* yuvFmt = static_cast<YUVFormat*>(videoFmtBase);
+    av_dict_set(&_mVideoOptionals, "pixel_format", YUVFormat::_mFmtUpon[yuvFmt->_mYUVPixelFormat].c_str(), 0);
 
-  case AV_PIX_FMT_UYVY422:
-  case AV_PIX_FMT_YUV422P:
-    _mFrameSize = _mVideoCfg._mWidth * _mVideoCfg._mHeight * 2;
-    break;
+    switch (yuvFmt->_mYUVPixelFormat) {
+    case AV_PIX_FMT_YUV444P:
+      _mFrameSize = videoFmtBase->_mWidth * videoFmtBase->_mHeight * 3;
+      break;
 
-  case AV_PIX_FMT_NV12:
-  case AV_PIX_FMT_NV21:
-    _mFrameSize = _mVideoCfg._mWidth * _mVideoCfg._mHeight * 3 / 2;
-    break;
+    case AV_PIX_FMT_UYVY422:
+    case AV_PIX_FMT_YUYV422:
+    case AV_PIX_FMT_YUV422P:
+      _mFrameSize = videoFmtBase->_mWidth * videoFmtBase->_mHeight * 2;
+      break;
 
-  default:
-    break;
-  }
+    case AV_PIX_FMT_NV12:
+    case AV_PIX_FMT_NV21:
+    case AV_PIX_FMT_YUV420P:
+      _mFrameSize = videoFmtBase->_mWidth * videoFmtBase->_mHeight * 3 / 2;
+      break;
 
-  int ret = avformat_open_input(&_mFmtCtx, devName.c_str(), av_find_input_format(inpName.c_str()), &_mVideoOptionals);
-  if (ret < 0) {
-    char errors[1024];
-    av_strerror(ret, errors, 1024);
-    LOGE("V Recorder", "Open camera error, error message \"{}\"", errors);
-    return AV_OPEN_INPUT_ERR;
-  }
-  
-  LOGI("V Recorder", "Open camera {} success", devName);
-
-  _mAVPkt = av_packet_alloc();
-  if (NULL == _mAVPkt) {
-    LOGE("V Recorder", "Alloc AVPacket error");
-    return AV_ALLOC_PACKET_ERR;
+    default:
+      break;
+    }
   }
 
   return AV_SUCCESS;
-}
-
-/**
-* Initialize audio recorder:
-*   Open input device, alloc AVPacket (for output)
-*
-* @param devName: Audio input device name
-* @param inpName: Input format name.
-*                eg. In macos is "avfoundation"
-*
-*/
-void VideoRecorder::uninit() {
-  if (NULL != _mFmtCtx) {
-    avformat_close_input(&_mFmtCtx);
-  }
-  
-  if (NULL != _mAVPkt) {
-    av_packet_free(&_mAVPkt);
-  }
-
-  if (NULL != _mVideoOptionals) {
-    av_dict_free(&_mVideoOptionals);
-  }
 }
 
 //void AudioRecorder::setDataSink(std::shared_ptr<DataSink> dataSink) {
@@ -145,14 +155,19 @@ void VideoRecorder::uninit() {
 *                eg. In macos is "avfoundation"
 *
 */
-AV_RET VideoRecorder::record() {
+AV_RET VideoRecorder::readData() {
   int ret = 0;
-  ret = av_read_frame(_mFmtCtx, _mAVPkt);
+  if (NULL == _mOutputPkt || NULL == _mInputFmtCtx) {
+    LOGE("V Recoder", "Read frame error, format context or output packet null, maybe not initialize");
+    return AV_UNINITIALIZE;
+  }
+
+  ret = av_read_frame(_mInputFmtCtx, _mOutputPkt);
   if (_mDataSink != nullptr)  {
-    _mDataSink->onData((uint8_t*)(_mAVPkt->data), _mFrameSize);
+    _mDataSink->onData((uint8_t*)(_mOutputPkt->data) + 32, _mFrameSize);
   }
   
-  av_packet_unref(_mAVPkt);
+  av_packet_unref(_mOutputPkt);
   
   return AV_SUCCESS;
 }

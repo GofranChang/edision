@@ -1,12 +1,12 @@
-prefix=/usr/local/ffmpeg
+prefix=./output
 exec_prefix=${prefix}
-libdir=/usr/local/ffmpeg/lib
-includedir=/usr/local/ffmpeg/include
+libdir=./output/lib
+includedir=./output/include
 
 Name: libswscale
 Description: FFmpeg image rescaling library
-Version: 4.8.100
-Requires: libavutil >= 55.78.100
+Version: 5.5.100
+Requires: libavutil >= 56.31.100
 Requires.private: 
 Conflicts:
 Libs: -L${libdir}  -lswscale -lm

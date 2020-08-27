@@ -15,7 +15,9 @@
 #define __EDISION_ENCODER_VIDEOENCODER_H__
 
 #include <string>
-#include <thread>
+//#include <thread>
+#include <vector>
+#include <utility>
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,25 +33,27 @@ extern "C" {
 }
 #endif
 
-#include "base/AVDataSinkBase.h"
-#include "base/AVDataSourceBase.h"
-#include "AVConfig.h"
+#include "IAVDataSink.h"
+#include "IAVDataSource.h"
 #include "AVError.h"
-#include "EncoderBase.h"
+#include "IEncoder.h"
 
 namespace edision {
 
-class VideoEncoder : public EncoderBase {
+class VideoEncoder : public IEncoder {
 public:
   VideoEncoder(std::string& codecName);
   ~VideoEncoder();
 
-  AV_RET setConfig(std::shared_ptr<MediaConfig> config) override;
+  AV_RET setConfig(std::shared_ptr<IAVFormat> srcFmt, std::shared_ptr<IAVFormat> dstFmt) override;
   
   AV_RET encode(const uint8_t* data, size_t size) override;
   
 private:
   int _mPts;
+//  std::unordered_map<int, int> _mOffserSize;
+  std::vector<std::pair<int, int>> _mOffsetSize;
+
 };
 
 }

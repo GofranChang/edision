@@ -18,179 +18,116 @@
 
 using namespace edision;
 
-static FILE* gFout = nullptr;
-
 //////////////////////////////////////////////////////
-// Audio Sink
-class MyRecDataSink : public AVDataSinkBase {
+class MyFileWriterSink : public IAVDataSink {
 public:
+  MyFileWriterSink(std::string fileName);
+  ~MyFileWriterSink();
+  
   virtual void onData(uint8_t* data, size_t size) override;
-  inline void setResampler(std::shared_ptr<AudioResampler> rsp) {
-    _mResampler = rsp;
-  }
   
 private:
-  std::shared_ptr<AudioResampler> _mResampler;
+  FILE* _mOutputFile;
 };
 
-void MyRecDataSink::onData(uint8_t *data, size_t size) {
-  _mResampler->resample(data, size);
-//  LOGD("Main", "onData, size ({})", size);
-//  if (gFout)
-//    fwrite(data, 1, size, gFout);
+MyFileWriterSink::MyFileWriterSink(std::string fileName) {
+  _mOutputFile = fopen(fileName.c_str(), "wb+");
 }
 
-class MyResampleDataSink : public AVDataSinkBase {
-public:
-  virtual void onData(uint8_t* data, size_t size) override;
-  inline void setEncoder(std::shared_ptr<EncoderBase> ecdr) {
-    _mEncoder = ecdr;
+MyFileWriterSink::~MyFileWriterSink() {
+  if (nullptr != _mOutputFile)
+    fclose(_mOutputFile);
+}
+
+void MyFileWriterSink::onData(uint8_t* data, size_t size) {
+  if (nullptr != _mOutputFile) {
+    LOGD("Demo", "Receive data, size ({})", size);
+    fwrite(data, 1, size, _mOutputFile);
   }
-
-private:
-  std::shared_ptr<EncoderBase> _mEncoder;
-};
-
-void MyResampleDataSink::onData(uint8_t *data, size_t size) {
-  // LOGD("Main", "onData, size ({})", size);
-  // if (gFout)
-  //   fwrite(data, 1, size, gFout);
-  _mEncoder->encode(data, size);
 }
 
-
-//////////////////////////////////////////////////////
-// Video Sink
-class MyCaptureDataSink : public AVDataSinkBase {
-public:
-  virtual void onData(uint8_t* data, size_t size) override;
-  inline void setEncoder(std::shared_ptr<EncoderBase> ecdr) {
-    _mEncoder = ecdr;
-  }
-
-private:
-  std::shared_ptr<EncoderBase> _mEncoder;
-};
-
-void MyCaptureDataSink::onData(uint8_t *data, size_t size) {
-  if (_mEncoder.get())
-    _mEncoder->encode(data, size);
-}
-
-class MyEncodedDataSink : public AVDataSinkBase {
-public:
-  virtual void onData(uint8_t* data, size_t size) override;
-};
-
-void MyEncodedDataSink::onData(uint8_t* data, size_t size) {
-  LOGD("Main", "onData, size ({})", size);
-  if (gFout)
-    fwrite(data, 1, size, gFout);
-}
 
 int main(int argc, const char* argv[]) {
   auto logger = my_media::KooLogger::Instance();
   logger->initLogger(spdlog::level::debug, true, "", false);
   
-  // Audio Encoder test
-#if 0
-  AudioRecorder recorder;
-  std::string devName = ":0";
-  std::string inpName = "avfoundation";
-  recorder.init(devName, inpName);
+#ifdef ENCODE_H264_TEST
+  /**
+   * Recoder Audio test
+   */
+  std::shared_ptr<InputDeviceBase> audioRecorder(InputDeviceBase::createNew(DEVICE_MICROPHONE));
+  audioRecorder->init(":0", "avfoundation");
   
-  std::shared_ptr<MyRecDataSink> recDataSink(new MyRecDataSink);
-  recorder.setDataSink(recDataSink);
+  std::shared_ptr<MyFileWriterSink> fileSink(new MyFileWriterSink("/Users/gofran/Documents/workspace/gitproj/edision/resource/out.pcm"));
+  audioRecorder->setDataSink(fileSink);
   
-  std::shared_ptr<AudioResampler> resampler(new AudioResampler);
-  AudioConfig inCfg;
-  AudioConfig outCfg;
+  for (int i = 0; i < 500; i++)
+    audioRecorder->readData();
+#endif
+  
+#if 1
+  /**
+   * Recoder Video test
+   */
+  std::shared_ptr<IInputDevice> videoRecorder(IInputDevice::createNew(DEVICE_CAMERA));
 
-  inCfg._mChannelLayout = AV_CH_LAYOUT_MONO;
-  inCfg._mChannelNums = 1;
-  inCfg._mSampleFmt = AV_SAMPLE_FMT_FLT;
-  inCfg._mSampleRate = 48000;
-
-  outCfg._mChannelLayout = AV_CH_LAYOUT_STEREO;
-  outCfg._mChannelNums = 2;
-  outCfg._mSampleFmt = AV_SAMPLE_FMT_S16;
-  outCfg._mSampleRate = 48000;
+  std::shared_ptr<MyFileWriterSink> fileSink(new MyFileWriterSink("/Users/gofran/Documents/workspace/gitproj/edision/resource/out.yuv"));
+  videoRecorder->setDataSink(fileSink);
   
-  std::shared_ptr<AudioConfig> AEncoderCfg(new AudioConfig);
-  AEncoderCfg->_mChannelLayout = AV_CH_LAYOUT_STEREO;
-  AEncoderCfg->_mChannelNums = 2;
-  AEncoderCfg->_mSampleFmt = AV_SAMPLE_FMT_S16;
-  AEncoderCfg->_mSampleRate = 48000;
-
+  std::shared_ptr<YUVFormat> recordYuvForat(new YUVFormat(AV_PIX_FMT_NV12, 1280, 720));
+//  recordYuvForat->_mPixelFormat = AV_PIX_FMT_NV12;
+//  recordYuvForat->_mWidth = 1280;
+//  recordYuvForat->_mHeight = 720;
+  recordYuvForat->_mFrameRate = 30;
+  videoRecorder->setFormat(recordYuvForat);
   
-  resampler->init(inCfg, outCfg, 512);
-  recDataSink->setResampler(resampler);
+  videoRecorder->init("0", "avfoundation");
   
-  std::shared_ptr<MyResampleDataSink> resampleSink(new MyResampleDataSink);
-  resampler->setDataSink(resampleSink);
-
-  std::string encoderName = "libfdk_aac";
-  std::shared_ptr<EncoderBase> encoder(EncoderBase::createNew(AUDIO, encoderName));
-  encoder->init();
-//  std::shared_ptr<AudioConfig> AEncoderCfg(&outCfg);
-  encoder->setConfig(AEncoderCfg);
-  
-  resampleSink->setEncoder(encoder);
-  
-  std::shared_ptr<MyEncodedDataSink> encoderSink(new MyEncodedDataSink);
-  encoder->setDataSink(encoderSink);
-  
-  gFout = fopen("/Users/gofran/Documents/workspace/gitproj/edision/resource/newout.aac", "wb+");
-  for (int i = 0; i < 500; i++) {
-//  while (1) {
-    recorder.record();
-  }
-  
-  fflush(gFout);
-  fclose(gFout);
+  for (int i = 0; i < 500; i++)
+    videoRecorder->readData();
 #endif
 
-#if 1
-  // Video Recoder test
-  VideoRecorder vRec;
-  std::string devName = "0";
-  std::string inpName = "avfoundation";
-  VideoConfig vCfg;
-  vCfg._mFmt = AV_PIX_FMT_NV12;
-  vCfg._mWidth = 640;
-  vCfg._mHeight = 480;
-  vCfg._mFrameRate = 30;
-  vRec.init(devName, inpName, vCfg);
-
-  std::shared_ptr<MyCaptureDataSink> capDataSink(new MyCaptureDataSink);
-  std::shared_ptr<MyEncodedDataSink> recDataSink(new MyEncodedDataSink);
-  
-  std::shared_ptr<H264Config> VEncoderCfg(new H264Config);
-  VEncoderCfg->_mFmt = AV_PIX_FMT_NV12;
-  VEncoderCfg->_mWidth = 640;
-  VEncoderCfg->_mHeight = 480;
-  VEncoderCfg->_mFrameRate = 30;
-  VEncoderCfg->_mProfile = FF_PROFILE_H264_HIGH;
-  VEncoderCfg->_mLevel = 50;
-  VEncoderCfg->_mGopSize = 25;
-  VEncoderCfg->_mBitRate = 1000 * 1024;
-  
+//#ifdef ENCODE_H264_TEST
+#if 0
+  /**
+   * Encoder yuv to h264 test
+   */
+  ////////////////////////////////////////////////////////
   std::string encoderName = "libx264";
-  std::shared_ptr<EncoderBase> encoder(EncoderBase::createNew(VIDEO, encoderName));
+  std::shared_ptr<IEncoder> encoder(IEncoder::createNew(VIDEO_ENCODER, encoderName));
   encoder->init();
-  //  std::shared_ptr<AudioConfig> AEncoderCfg(&outCfg);
-  encoder->setConfig(VEncoderCfg);
+  
+  std::shared_ptr<YUVFormat> inputFmt(new YUVFormat(AV_PIX_FMT_YUV420P, 1280, 720));
+  
+  std::shared_ptr<H264Format> outputFmt(new H264Format(1280, 720));
+  outputFmt->_mBitRate = 1000 * 1024;
+  outputFmt->_mProfile = FF_PROFILE_H264_HIGH_444;
+  outputFmt->_mFrameRate = 50;
+  outputFmt->_mGopSize = 25;
+  
+  encoder->setConfig(inputFmt, outputFmt);
+  
+  std::shared_ptr<MyFileWriterSink> recDataSink(new MyFileWriterSink("/Users/gofran/Documents/workspace/gitproj/edision/build/newout.h264"));
   encoder->setDataSink(recDataSink);
   
-  capDataSink->setEncoder(encoder);
-  vRec.setDataSink(capDataSink);
-
-  gFout = fopen("/Users/gofran/Documents/workspace/gitproj/edision/resource/newout.h264", "wb+");
-  for (int i = 0; i < 500; i++) {
-//  while (1) {
-    vRec.record();
+  FILE* inputYuv = fopen("/Users/gofran/Documents/workspace/gitproj/edision/build/ConferenceMotion_1280_720_50.yuv", "rb+");
+  if (nullptr == inputYuv) {
+    LOGE("Main", "Open input yuv failed, {}", strerror(errno));
+    return -1;
   }
-#endif
+
+  int ret = 0;
+  uint8_t readBuf[1382400];
+  memset(readBuf, 0, 1280 * 720 * 3 / 2);
+  while (!feof(inputYuv)) {
+    ret = fread(readBuf, 1, 1280 * 720 * 3 / 2, inputYuv);
+    
+    encoder->encode(readBuf, 1280 * 720 * 3 / 2);
+  }
+  
+  fclose(inputYuv);
+  ////////////////////////////////////////////////////////
+#endif // ENCODE_H264_TEST
   
   return 0;
 }

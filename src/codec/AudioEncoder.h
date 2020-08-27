@@ -15,7 +15,7 @@
 #define __EDISION_ENCODER_AUDIOENCODER_H__
 
 #include <string>
-#include <thread>
+//#include <thread>
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,21 +31,22 @@ extern "C" {
 }
 #endif
 
-#include "base/AVDataSinkBase.h"
-#include "base/AVDataSourceBase.h"
-#include "AVConfig.h"
+#include "IAVDataSink.h"
+#include "IAVDataSource.h"
 #include "AVError.h"
-#include "EncoderBase.h"
+#include "IEncoder.h"
+#include "IAVFormat.h"
 
 namespace edision {
 
-class AudioEncoder : public EncoderBase {
+// TODO: Modify this later
+class AudioEncoder : public IEncoder {
 public:
   AudioEncoder(std::string& codecName);
   ~AudioEncoder();
 
 public:
-  AV_RET setConfig(std::shared_ptr<MediaConfig> config) override;
+  AV_RET setConfig(std::shared_ptr<IAVFormat> srcFmt, std::shared_ptr<IAVFormat> dstFmt) override;
   
   AV_RET encode(const uint8_t* data, size_t size) override;
 };

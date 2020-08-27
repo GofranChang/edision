@@ -24,71 +24,7 @@ namespace edision {
 *                eg. In macos is "avfoundation"
 *
 */
-AudioRecorder::AudioRecorder() : _mAVPkt(nullptr)
-                               , _mFmtCtx(nullptr) {
-}
-
-/**
-* Initialize audio recorder:
-*   Open input device, alloc AVPacket (for output)
-*
-* @param devName: Audio input device name
-* @param inpName: Input format name.
-*                eg. In macos is "avfoundation"
-*
-*/
-AudioRecorder::~AudioRecorder() {
-  uninit();
-}
-
-/**
- * Initialize audio recorder:
- *   Open input device, alloc AVPacket (for output)
- *
- * @param devName: Audio input device name
- * @param inpName: Input format name.
- *                eg. In macos is "avfoundation"
- *
- */
-AV_RET AudioRecorder::init(std::string& devName, std::string& inpName) {
-  avdevice_register_all();
-
-  int ret = avformat_open_input(&_mFmtCtx, devName.c_str(), av_find_input_format(inpName.c_str()), NULL);
-  if (ret < 0) {
-    char errors[1024];
-    av_strerror(ret, errors, 1024);
-    LOGE("A Recorder", "Open microphone error, error message \"{}\"", errors);
-    return AV_OPEN_INPUT_ERR;
-  }
-  
-  LOGI("A Recorder", "Open microphone {} success", devName);
-
-  _mAVPkt = av_packet_alloc();
-  if (NULL == _mAVPkt) {
-    LOGE("A Recorder", "Alloc AVPacket error");
-    return AV_ALLOC_PACKET_ERR;
-  }
-
-  return AV_SUCCESS;
-}
-
-/**
-* Initialize audio recorder:
-*   Open input device, alloc AVPacket (for output)
-*
-* @param devName: Audio input device name
-* @param inpName: Input format name.
-*                eg. In macos is "avfoundation"
-*
-*/
-void AudioRecorder::uninit() {
-  if (NULL != _mFmtCtx) {
-    avformat_close_input(&_mFmtCtx);
-  }
-  
-  if (NULL != _mAVPkt) {
-    av_packet_free(&_mAVPkt);
-  }
+AudioRecorder::AudioRecorder() {
 }
 
 //void AudioRecorder::setDataSink(std::shared_ptr<DataSink> dataSink) {
@@ -104,18 +40,27 @@ void AudioRecorder::uninit() {
 *                eg. In macos is "avfoundation"
 *
 */
-AV_RET AudioRecorder::record() {
+AV_RET AudioRecorder::readData() {
   int ret = 0;
-  ret = av_read_frame(_mFmtCtx, _mAVPkt);
+  if (NULL == _mOutputPkt || NULL == _mInputFmtCtx) {
+    LOGE("A Recoder", "Read frame error, format context or output packet null, maybe not initialize");
+    return AV_UNINITIALIZE;
+  }
+
+  ret = av_read_frame(_mInputFmtCtx, _mOutputPkt);
   if (_mDataSink != nullptr)  {
-    _mDataSink->onData((uint8_t*)(_mAVPkt->data), _mAVPkt->size);
+    LOGT("A Recoder", "Read audio data, size {}", _mOutputPkt->size)
+    _mDataSink->onData((uint8_t*)(_mOutputPkt->data), _mOutputPkt->size);
+  } else {
+    LOGW("A Recoder", "Read audio data, but not set sink");
   }
   
-  av_packet_unref(_mAVPkt);
+  av_packet_unref(_mOutputPkt);
   
   return AV_SUCCESS;
 }
 
+#if 0
 /**
 * Initialize audio recorder:
 *   Open input device, alloc AVPacket (for output)
@@ -204,5 +149,6 @@ void AudioResampler::uninit() {
   
   swr_free(&_mSwrCtx);
 }
+#endif
 
 } //namespace edision
