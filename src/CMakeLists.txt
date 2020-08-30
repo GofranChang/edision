@@ -127,8 +127,8 @@ if(APPLE)
             "postproc"
             "x264"
             "fdk-aac"
-            # "x265"
-            # ${SDL2_LIB}
+            "x265"
+            ${SDL2_LIB}
         )
     endif(IOS)
 endif(APPLE)

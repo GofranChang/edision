@@ -164,7 +164,7 @@ AV_RET VideoRecorder::readData() {
 
   ret = av_read_frame(_mInputFmtCtx, _mOutputPkt);
   if (_mDataSink != nullptr)  {
-    _mDataSink->onData((uint8_t*)(_mOutputPkt->data) + 32, _mFrameSize);
+    _mDataSink->onData((uint8_t*)(_mOutputPkt->data), _mFrameSize);
   }
   
   av_packet_unref(_mOutputPkt);
