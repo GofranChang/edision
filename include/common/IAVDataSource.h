@@ -11,8 +11,8 @@
  * This file is part of Edision.
  */
 
-#ifndef __EDISION_COMMON_BASE_IAVSOURCE__
-#define __EDISION_COMMON_BASE_IAVSOURCE__
+#ifndef __EDISION_COMMON_IAVDATASOURCE_H__
+#define __EDISION_COMMON_IAVDATASOURCE_H__
 
 #include <stdint.h>
 #include <stddef.h>
@@ -24,18 +24,17 @@ namespace edision {
 
 class IAVDataSource {
 public:
-  IAVDataSource() : _mDataSink(nullptr) {
-  }
-  ~IAVDataSource() = default;
-  
-  inline void setDataSink(std::shared_ptr<IAVDataSink> dataSink) {
-    _mDataSink = dataSink;
-  }
+    IAVDataSource(); // : _mDataSink(nullptr) {}
+    ~IAVDataSource(); // = default;
+
+    inline void setDataSink(std::shared_ptr<IAVDataSink> dataSink) {
+        _mDataSink = dataSink;
+    }
   
 protected:
-  std::shared_ptr<IAVDataSink> _mDataSink;
+    std::shared_ptr<IAVDataSink> _mDataSink;
 };
 
 } // namespace edision
 
-#endif // __EDISION_COMMON_BASE_IAVSOURCE__
+#endif // __EDISION_COMMON_IAVDATASOURCE_H__

@@ -11,8 +11,8 @@
  * This file is part of Edision.
  */
 
-#ifndef __EDISION_COMMON_BASE_IAVSINK__
-#define __EDISION_COMMON_BASE_IAVSINK__
+#ifndef __EDISION_COMMON_IAVDATASINK_H__
+#define __EDISION_COMMON_IAVDATASINK_H__
 
 #include <stdint.h>
 #include <stddef.h>
@@ -21,9 +21,9 @@ namespace edision {
 
 class IAVDataSink {
 public:
-  virtual void onData(uint8_t* data, size_t size) = 0;
+    virtual void onData(uint8_t* data, size_t size) = 0;
 };
 
 } // namespace edision
 
-#endif // __EDISION_COMMON_BASE_IAVSINK__
+#endif // __EDISION_COMMON_IAVDATASINK_H__
