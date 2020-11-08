@@ -11,9 +11,9 @@ namespace edision {
 *                eg. In macos is "avfoundation"
 *
 */
-FfmpegVideoRecorder::FfmpegVideoRecorder() : _mVideoOptionals(nullptr)
+FfmpegVideoRecorder::FfmpegVideoRecorder() : _mVideoOptionals(NULL)
                                            , _mOutputPkt(NULL)
-                                           , _mInputFmtCtx(NULL){
+                                           , _mInputFmtCtx(NULL) {
     av_register_all();
 }
 
@@ -113,8 +113,13 @@ AV_RET FfmpegVideoRecorder::setFormat(std::shared_ptr<IAVFormatBase> fmt) {
             break;
 
         default:
+            LOGW("V Recorder", "Unsupport yuv format {}", yuvFmt->_mYUVPixelFormat);
+            return AV_FMT_UNSUPPORT;
             break;
         }
+    } else {
+        LOGW("V Recorder", "Set ffmpeg video recorder format, unsupport format {}", videoFmtBase->_mVideoFormat);
+        return AV_FMT_UNSUPPORT;
     }
 
     return AV_SUCCESS;
