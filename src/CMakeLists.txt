@@ -1,6 +1,7 @@
 file(GLOB HEADER_FILES
     ${PROJECT_SOURCE_DIR}/include/common/*.h
     ${PROJECT_SOURCE_DIR}/include/devices/*.h
+    ${PROJECT_SOURCE_DIR}/include/codec/*.h
 )
 
 set(EDISION_SRC
@@ -9,6 +10,9 @@ set(EDISION_SRC
     ${PROJECT_SOURCE_DIR}/src/devices/IDevices.cc
     ${PROJECT_SOURCE_DIR}/src/devices/ffmpeg/FfmpegVideoRecorder.h
     ${PROJECT_SOURCE_DIR}/src/devices/ffmpeg/FfmpegVideoRecorder.cc
+    ${PROJECT_SOURCE_DIR}/src/codec/ICodec.cc
+    ${PROJECT_SOURCE_DIR}/src/codec/ffmpeg/FfmpegVideoEncoder.h
+    ${PROJECT_SOURCE_DIR}/src/codec/ffmpeg/FfmpegVideoEncoder.cc
 )
 
 set(FFMPEG_LIB

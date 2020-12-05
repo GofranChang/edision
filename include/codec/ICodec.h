@@ -34,7 +34,7 @@ public:
 
     virtual AV_RET setFormat(std::shared_ptr<IAVFormatBase> srcFmt, std::shared_ptr<IAVFormatBase> dstFmt) = 0;
 
-    virtual AV_RET readData() = 0;
+    virtual AV_RET encode(const uint8_t* data, size_t size) = 0;
 
 protected:
     std::string _mCodecName;

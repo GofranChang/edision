@@ -16,12 +16,13 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <memory>
 
 namespace edision {
 
 class IAVDataSink {
 public:
-    virtual void onData(uint8_t* data, size_t size) = 0;
+    virtual void onData(std::shared_ptr<uint8_t> data, size_t size) = 0;
 };
 
 } // namespace edision

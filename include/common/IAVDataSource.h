@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <memory>
+#include <vector>
 
 #include "IAVDataSink.h"
 
@@ -28,11 +29,11 @@ public:
     ~IAVDataSource(); // = default;
 
     inline void setDataSink(std::shared_ptr<IAVDataSink> dataSink) {
-        _mDataSink = dataSink;
+        _mDataSink.push_back(dataSink);
     }
   
 protected:
-    std::shared_ptr<IAVDataSink> _mDataSink;
+    std::vector<std::shared_ptr<IAVDataSink>> _mDataSink;
 };
 
 } // namespace edision

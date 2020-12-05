@@ -17,7 +17,7 @@ public:
     ~SDLRenderSink();
 
     int init(int width, int height);
-    virtual void onData(uint8_t* data, size_t size) override;
+    virtual void onData(std::shared_ptr<uint8_t> data, size_t size) override;
 
 private:
     SDL_Window*   _mSDLScreen;
@@ -56,9 +56,9 @@ int SDLRenderSink::init(int width, int height) {
     return 0;
 }
 
-void SDLRenderSink::onData(uint8_t *data, size_t size) {
+void SDLRenderSink::onData(std::shared_ptr<uint8_t> data, size_t size) {
     LOGD("Rendor", "onData, size {}", size);
-    SDL_UpdateTexture(_mSDLTexture, NULL, data, 1280);
+    SDL_UpdateTexture(_mSDLTexture, NULL, data.get(), 1280);
 
     SDL_RenderClear(_mSDLRenderer);
     SDL_RenderCopy(_mSDLRenderer, _mSDLTexture, NULL, NULL);
