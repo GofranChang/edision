@@ -93,7 +93,7 @@ struct IYUVFormat : public IVideoFormatBase {
  * H264 Format
  */
 struct IH264Format : public IVideoFormatBase {
-    IH264Format(int width, int height);
+    IH264Format(int width, int height, int frameRate);
 
     // Required
     int _mProfile;

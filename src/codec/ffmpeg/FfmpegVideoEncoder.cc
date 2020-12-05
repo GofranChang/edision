@@ -159,7 +159,7 @@ AV_RET FfmpegVideoEncoder::encode(const uint8_t* data, size_t size) {
     _mFrame->pts = _mPts++;
     ret = avcodec_send_frame(_mCodecCtx, _mFrame);
     if (ret < 0) {
-        LOGE("A Encoder", "Send audio encoder data error, ret ({})", ret);
+        LOGE("A Encoder", "Send video encoder data error, ret ({})", ret);
         return AV_ENCODE_SEND_ERR;
     }
 

@@ -2,6 +2,7 @@ file(GLOB HEADER_FILES
     ${PROJECT_SOURCE_DIR}/include/common/*.h
     ${PROJECT_SOURCE_DIR}/include/devices/*.h
     ${PROJECT_SOURCE_DIR}/include/codec/*.h
+    ${PROJECT_SOURCE_DIR}/include/utils/*.h
 )
 
 set(EDISION_SRC
@@ -13,6 +14,7 @@ set(EDISION_SRC
     ${PROJECT_SOURCE_DIR}/src/codec/ICodec.cc
     ${PROJECT_SOURCE_DIR}/src/codec/ffmpeg/FfmpegVideoEncoder.h
     ${PROJECT_SOURCE_DIR}/src/codec/ffmpeg/FfmpegVideoEncoder.cc
+    ${PROJECT_SOURCE_DIR}/src/utils/IFileSink.cc
 )
 
 set(FFMPEG_LIB

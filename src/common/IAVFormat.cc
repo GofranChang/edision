@@ -9,10 +9,10 @@ IAVFormatBase::IAVFormatBase(MediaType type) : _mMediaType(type) {
 IVideoFormatBase::IVideoFormatBase(VideoFormatType type, \
                                     int width, \
                                     int height)
-    : _mVideoFormat(type)
-    , _mWidth(width)
-    , _mHeight(height)
-    , IAVFormatBase(VideoType) {
+        : _mVideoFormat(type)
+        , _mWidth(width)
+        , _mHeight(height)
+        , IAVFormatBase(VideoType) {
 }
 
 std::map<YUVFormatType, std::string>  IYUVFormat::_mFmtUpon = IYUVFormat::createFmtUpon();
@@ -20,8 +20,16 @@ std::map<YUVFormatType, std::string>  IYUVFormat::_mFmtUpon = IYUVFormat::create
 IYUVFormat::IYUVFormat(YUVFormatType formatType, \
                         int width, \
                         int height)
-    : _mYUVPixelFormat(formatType)
-    , IVideoFormatBase(VideoYUV, width, height) {
+        : _mYUVPixelFormat(formatType)
+        , IVideoFormatBase(VideoYUV, width, height) {
+    if (VideoYUV_420P == _mYUVPixelFormat) {
+        _mYOffset = 0;
+        _mYSize = width * height;
+        _mUOffset = _mYSize;
+        _mUSize = width * height / 4;
+        _mVOffset = _mYSize + _mUSize;
+        _mVSize = width * height / 4;
+    }
 }
 
 std::map<YUVFormatType, std::string> IYUVFormat::createFmtUpon() {
@@ -36,7 +44,7 @@ std::map<YUVFormatType, std::string> IYUVFormat::createFmtUpon() {
     return res;
 }
 
-IH264Format::IH264Format(int width, int height) : IVideoFormatBase(VideoH264, width, height) {
+IH264Format::IH264Format(int width, int height, int framerate) : IVideoFormatBase(VideoH264, width, height) {
 }
 
 }; // namespace edision

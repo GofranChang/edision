@@ -31,6 +31,7 @@ enum AV_RET {
     AV_ENCODE_RECV_ERR,
     AV_ALLOC_SWR_CTX_ERR,
     AV_MEM_EMPTY,
+    AV_OPEN_FILE_ERR,
 };
 
 } // namespace edision

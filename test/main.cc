@@ -4,6 +4,8 @@
 #include "common/IAVDataSource.h"
 #include "common/IAVFormat.h"
 #include "devices/IDevices.h"
+#include "codec/ICodec.h"
+#include "utils/IFileSink.h"
 
 #include "MyLogger.h"
 
@@ -68,18 +70,34 @@ void SDLRenderSink::onData(std::shared_ptr<uint8_t> data, size_t size) {
 int main(int argc, const char* argv[]) {
     auto logger = my_media::KooLogger::Instance();
     logger->initLogger(spdlog::level::debug, true, "", false);
+    
+    // IFileSink
+    std::shared_ptr<IFileSink> fileSink(new IFileSink("/Users/gofran/Documents/workspace/gitproj/edision/build/output.h264"));
+    fileSink->open();
 
+    // Create FfmpegVideoRecorder
     std::shared_ptr<IInputDevice> ffmpegVideoRecorder(IInputDevice::createNew(DEVICE_FFMPEG_CAMERA));
-
     std::shared_ptr<IYUVFormat> yuvFmt(new IYUVFormat(VideoYUV_NV12, 1280, 720));
     yuvFmt->_mFrameRate = 30;
-
     std::shared_ptr<SDLRenderSink> sdlSink(new SDLRenderSink);
     sdlSink->init(1280, 720);
-
     ffmpegVideoRecorder->setFormat(yuvFmt);
     ffmpegVideoRecorder->setDataSink(sdlSink);
     ffmpegVideoRecorder->init("0", "avfoundation");
+
+    // Create FfmpegVideoEncoder
+    std::string codecName = "libx264";
+    std::shared_ptr<IEncoder> ffmpegVideoEncoder(IEncoder::createNew(FFMPEG_VIDEO_ENCODER, codecName));
+    ffmpegVideoEncoder->init();
+    std::shared_ptr<IH264Format> h264Format(new IH264Format(1280, 720, 30));
+    h264Format->_mBitRate = 1000 * 1024;
+    h264Format->_mProfile = 144;
+    h264Format->_mGopSize = 25;
+    h264Format->_mFrameRate = 30;
+    std::shared_ptr<IYUVFormat> yuvFmt2(new IYUVFormat(VideoYUV_420P, 1280, 720));
+    ffmpegVideoEncoder->setFormat(yuvFmt2, h264Format);
+    ffmpegVideoRecorder->setDataSink(ffmpegVideoEncoder);
+    ffmpegVideoEncoder->setDataSink(fileSink);
 
     for (int i = 0; i < 500; i++)
         ffmpegVideoRecorder->readData();
