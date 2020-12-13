@@ -4,8 +4,8 @@
 #include <string>
 #include <stdio.h>
 
-#include "common/IAVDataSink.h"
-#include "common/IAVError.h"
+#include "IAVDataSink.h"
+#include "IAVError.h"
 
 namespace edision {
 

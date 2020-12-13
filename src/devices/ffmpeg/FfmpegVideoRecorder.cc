@@ -1,4 +1,5 @@
 #include "FfmpegVideoRecorder.h"
+#include "MyLogger.h"
 
 namespace edision {
 

@@ -29,7 +29,10 @@ set(FFMPEG_LIB
 )
 
 include_directories("${FFMPEG_DIR}/include")
-include_directories("${PROJECT_SOURCE_DIR}/include")
+include_directories("${PROJECT_SOURCE_DIR}/include/codec")
+include_directories("${PROJECT_SOURCE_DIR}/include/common")
+include_directories("${PROJECT_SOURCE_DIR}/include/devices")
+include_directories("${PROJECT_SOURCE_DIR}/include/utils")
 include_directories("${PROJECT_SOURCE_DIR}/src/devices")
 
 link_directories("${FFMPEG_DIR}/lib")
@@ -83,6 +86,10 @@ endif(APPLE)
 
 add_library(edision SHARED ${HEADER_FILES} ${EDISION_SRC})
 target_link_libraries(edision ${FFMPEG_LIB} logger ${PLATFORM_LIB})
+
+install(FILES ${HEADER_FILES} DESTINATION ${PROJECT_SOURCE_DIR}/output/include)
+
+install(TARGETS edision DESTINATION ${PROJECT_SOURCE_DIR}/output/libs)
 
 set(EDISION_DEMO
     ${PROJECT_SOURCE_DIR}/test/main.cc

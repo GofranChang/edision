@@ -3,9 +3,9 @@
 
 #include <memory>
 
-#include "common/IAVError.h"
-#include "common/IAVFormat.h"
-#include "common/IAVDataSource.h"
+#include "IAVError.h"
+#include "IAVFormat.h"
+#include "IAVDataSource.h"
 
 namespace edision {
 

@@ -4,3 +4,6 @@
 /build/
 /build_ios/
 /build_mac/
+/deps/
+/output/
+/edision/

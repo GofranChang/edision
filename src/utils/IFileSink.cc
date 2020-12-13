@@ -1,4 +1,4 @@
-#include "utils/IFileSink.h"
+#include "IFileSink.h"
 #include "MyLogger.h"
 
 namespace edision {
@@ -20,6 +20,8 @@ AV_RET IFileSink::open() {
 AV_RET IFileSink::close() {
     if (_mFp != nullptr)
         ::fclose(_mFp);
+
+    return AV_SUCCESS;
 }
 
 void IFileSink::onData(std::shared_ptr<uint8_t> data, size_t size) {

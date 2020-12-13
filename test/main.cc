@@ -1,11 +1,11 @@
 #include <memory>
 
-#include "common/IAVDataSink.h"
-#include "common/IAVDataSource.h"
-#include "common/IAVFormat.h"
-#include "devices/IDevices.h"
-#include "codec/ICodec.h"
-#include "utils/IFileSink.h"
+#include "IAVDataSink.h"
+#include "IAVDataSource.h"
+#include "IAVFormat.h"
+#include "IDevices.h"
+#include "ICodec.h"
+#include "IFileSink.h"
 
 #include "MyLogger.h"
 

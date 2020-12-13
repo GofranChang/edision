@@ -1,4 +1,4 @@
-#include "codec/ICodec.h"
+#include "ICodec.h"
 
 #include "MyLogger.h"
 #include "ffmpeg/FfmpegVideoEncoder.h"

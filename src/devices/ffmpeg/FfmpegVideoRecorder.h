@@ -1,7 +1,7 @@
 #ifndef __EDISION_DEVICE_FFMPEGVIDEORECORDER_H__
 #define __EDISION_DEVICE_FFMPEGVIDEORECORDER_H__
 
-#include "devices/IDevices.h"
+#include "IDevices.h"
 
 #ifdef __cplusplus
 extern "C" {

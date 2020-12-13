@@ -4,8 +4,6 @@
 #include <map>
 #include <string>
 
-#include "MyLogger.h"
-
 namespace edision {
 
 enum MediaType {

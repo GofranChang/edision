@@ -1,7 +1,7 @@
 #ifndef __EDISION_CODEC_FFMPEGVIDEOCODEC_H__
 #define __EDISION_CODEC_FFMPEGVIDEOCODEC_H__
 
-#include "codec/ICodec.h"
+#include "ICodec.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,4 +1,4 @@
-#include "devices/IDevices.h"
+#include "IDevices.h"
 
 #include "MyLogger.h"
 #include "ffmpeg/FfmpegVideoRecorder.h"

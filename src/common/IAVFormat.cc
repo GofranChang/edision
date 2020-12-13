@@ -1,4 +1,4 @@
-#include "common/IAVFormat.h"
+#include "IAVFormat.h"
 
 namespace edision {
 
