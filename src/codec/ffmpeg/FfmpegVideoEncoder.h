@@ -30,9 +30,7 @@ public:
 
     virtual AV_RET setFormat(std::shared_ptr<IAVFormatBase> srcFmt, std::shared_ptr<IAVFormatBase> dstFmt) override;
 
-    virtual void onData(std::shared_ptr<uint8_t> data, size_t size) override;
-
-    virtual AV_RET encode(const uint8_t* data, size_t size) override;
+    virtual AV_RET encode(uint8_t* data, size_t size) override;
 
 private:
     std::vector<std::pair<int, int>> _mOffsetSize;

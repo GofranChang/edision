@@ -81,6 +81,9 @@ if(APPLE)
             "x265"
             ${SDL2_LIB}
         )
+        set(PLATFORM_DEMO_SOURCE
+            "${PROJECT_SOURCE_DIR}/test/Info.plist"
+        )
     endif(IOS)
 endif(APPLE)
 
@@ -95,5 +98,5 @@ set(EDISION_DEMO
     ${PROJECT_SOURCE_DIR}/test/main.cc
 )
 
-add_executable(edisionTest ${EDISION_DEMO})
+add_executable(edisionTest ${EDISION_DEMO} ${PLATFORM_DEMO_SOURCE})
 target_link_libraries(edisionTest edision)

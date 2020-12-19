@@ -4,12 +4,12 @@
 #include <string>
 #include <stdio.h>
 
-#include "IAVDataSink.h"
+#include "IAVDataObserver.h"
 #include "IAVError.h"
 
 namespace edision {
 
-class IFileSink : public IAVDataSink {
+class IFileSink : public IAVDataObserver {
 public:
     IFileSink(std::string fileName);
     AV_RET open();

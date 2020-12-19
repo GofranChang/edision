@@ -134,11 +134,11 @@ AV_RET FfmpegVideoRecorder::readData() {
     }
 
     ret = av_read_frame(_mInputFmtCtx, _mOutputPkt);
-    if (!_mDataSink.empty())  {
+    if (!_mDataObserver.empty())  {
         std::shared_ptr<uint8_t> dataPtr(new uint8_t[_mFrameSize]);
         memcpy(dataPtr.get(), _mOutputPkt->data, _mFrameSize);
-        for (auto sink : _mDataSink)
-            sink->onData(dataPtr, _mFrameSize);
+        for (auto observer : _mDataObserver)
+            observer->onData(dataPtr, _mFrameSize);
     }
 
     av_packet_unref(_mOutputPkt);

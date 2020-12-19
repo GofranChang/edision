@@ -20,7 +20,7 @@
 
 namespace edision {
 
-class IAVDataSink {
+class IAVDataObserver {
 public:
     virtual void onData(std::shared_ptr<uint8_t> data, size_t size) = 0;
 };

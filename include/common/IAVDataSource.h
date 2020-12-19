@@ -19,7 +19,7 @@
 #include <memory>
 #include <vector>
 
-#include "IAVDataSink.h"
+#include "IAVDataObserver.h"
 
 namespace edision {
 
@@ -28,12 +28,12 @@ public:
     IAVDataSource(); // : _mDataSink(nullptr) {}
     ~IAVDataSource(); // = default;
 
-    inline void setDataSink(std::shared_ptr<IAVDataSink> dataSink) {
-        _mDataSink.push_back(dataSink);
+    inline void setDataObserver(std::shared_ptr<IAVDataObserver> dataSink) {
+        _mDataObserver.push_back(dataSink);
     }
   
 protected:
-    std::vector<std::shared_ptr<IAVDataSink>> _mDataSink;
+    std::vector<std::shared_ptr<IAVDataObserver>> _mDataObserver;
 };
 
 } // namespace edision

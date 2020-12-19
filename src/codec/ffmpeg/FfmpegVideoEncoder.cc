@@ -146,14 +146,15 @@ AV_RET FfmpegVideoEncoder::setFormat(std::shared_ptr<IAVFormatBase> srcFmt, std:
     return AV_SUCCESS;
 }
 
-AV_RET FfmpegVideoEncoder::encode(const uint8_t* data, size_t size) {
+AV_RET FfmpegVideoEncoder::encode(uint8_t* data, size_t size) {
     for (int i = 0; i < _mOffsetSize.size(); i++) {
-        if (nullptr != _mFrame->data[0])
-            memcpy((void*)_mFrame->data[i], data + _mOffsetSize[i].first, _mOffsetSize[i].second);
-        else {
-            LOGW("V Encoder", "Copy data failed, maybe not initialize");
-            return AV_UNINITIALIZE;
-        }
+//        if (nullptr != _mFrame->data[0])
+//            memcpy((void*)_mFrame->data[i], data + _mOffsetSize[i].first, _mOffsetSize[i].second);
+//        else {
+//            LOGW("V Encoder", "Copy data failed, maybe not initialize");
+//            return AV_UNINITIALIZE;
+//        }
+        _mFrame->data[i] = data + _mOffsetSize[i].first;
     }
 
     int ret = 0;
@@ -172,19 +173,14 @@ AV_RET FfmpegVideoEncoder::encode(const uint8_t* data, size_t size) {
         }
     }
 
-    if (!_mDataSink.empty()) {
+    if (!_mDataObserver.empty()) {
         std::shared_ptr<uint8_t> dataPtr(new uint8_t[_mPacket->size]);
         memcpy(dataPtr.get(), _mPacket->data, _mPacket->size);
-        for (auto sink : _mDataSink)
-            sink->onData(dataPtr, _mPacket->size);
+        for (auto observer : _mDataObserver)
+            observer->onData(dataPtr, _mPacket->size);
     }
 
     return AV_SUCCESS;
-}
-
-void FfmpegVideoEncoder::onData(std::shared_ptr<uint8_t> data, size_t size) {
-    encode(data.get(), size);
-    return;
 }
 
 } // namespace edision

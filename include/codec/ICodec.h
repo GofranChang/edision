@@ -19,8 +19,7 @@ enum CodecType {
     // DEVICE_ANDROID_CAMERA,
 };
 
-class IEncoder : public IAVDataSource
-               , public IAVDataSink {
+class IEncoder : public IAVDataSource {
 protected:
     IEncoder(std::string codecName);
     virtual ~IEncoder();
@@ -34,15 +33,10 @@ public:
 
     virtual AV_RET setFormat(std::shared_ptr<IAVFormatBase> srcFmt, std::shared_ptr<IAVFormatBase> dstFmt) = 0;
 
-    virtual AV_RET encode(const uint8_t* data, size_t size) = 0;
+    virtual AV_RET encode(uint8_t* data, size_t size) = 0;
 
 protected:
     std::string _mCodecName;
-
-// protected:
-//     AVPacket*                     _mOutputPkt;
-//     AVFormatContext*              _mInputFmtCtx;
-//     std::shared_ptr<IAVFormat>    _mFmtBase;
 };
 
 }; // namespace edision
